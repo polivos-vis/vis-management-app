@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ownedWorkspaces    Workspace[]
+  workspaceMembers   WorkspaceMember[]
+  assignedItems      Item[]            @relation("AssignedItems")
+  comments           Comment[]
+  activityLogs       ActivityLog[]
+  notifications      Notification[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner   User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members WorkspaceMember[]
+  boards  Board[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String   @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        String   @default("member")
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+model Board {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  workspaceId String
+  isRetainer  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace    Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  groups       Group[]
+  activityLogs ActivityLog[]
+
+  @@map("boards")
+}
+
+model Group {
+  id        String   @id @default(cuid())
+  name      String
+  boardId   String
+  position  Int
+  color     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  board Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  items Item[]
+
+  @@map("groups")
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  title       String
+  groupId     String
+  position    Int
+  status      String   @default("todo")
+  priority    String   @default("medium")
+  startDate   DateTime?
+  dueDate     DateTime?
+  assignedTo  String?
+  description String?
+  notes       String?
+  isArchived  Boolean  @default(false)
+  completedAt DateTime?
+  retainerHours Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  group        Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  assignedUser User?         @relation("AssignedItems", fields: [assignedTo], references: [id], onDelete: SetNull)
+  comments     Comment[]
+  activityLogs ActivityLog[]
+
+  @@map("items")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  itemId    String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  action      String
+  entityType  String
+  entityId    String
+  description String
+  userId      String
+  boardId     String?
+  itemId      String?
+  createdAt   DateTime @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  board Board? @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  item  Item?  @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("activity_logs")
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String
+  title       String
+  message     String
+  itemId      String?
+  boardId     String?
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
