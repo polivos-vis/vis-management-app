@@ -76,6 +76,32 @@ export const Layout: React.FC = () => {
               </button>
             </div>
           </div>
+          <div className="md:hidden py-3 border-t border-gray-100">
+            <nav className="flex items-center gap-2">
+              <Link
+                to="/workspaces"
+                className={`flex-1 flex items-center justify-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/workspaces')
+                    ? 'bg-primary-50 text-primary-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Briefcase className="w-4 h-4" />
+                <span>Workspaces</span>
+              </Link>
+              <Link
+                to="/my-tasks"
+                className={`flex-1 flex items-center justify-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/my-tasks')
+                    ? 'bg-primary-50 text-primary-700'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <User className="w-4 h-4" />
+                <span>My Tasks</span>
+              </Link>
+            </nav>
+          </div>
         </div>
       </header>
 

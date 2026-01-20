@@ -125,64 +125,66 @@ export const GroupComponent: React.FC<GroupComponentProps> = ({
         )}
       </div>
 
-      <div className="card !p-0">
-        <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700">
-          <div className="col-span-2">Title</div>
-          <div className="col-span-3">Notes</div>
-          <div className="col-span-2">Status</div>
-          <div className="col-span-1">Priority</div>
-          <div className="col-span-1">Assignee</div>
-          <div className="col-span-1">Start</div>
-          <div className="col-span-1">Due</div>
-          <div className="col-span-1"></div>
+      <div className="card !p-0 overflow-x-auto">
+        <div className="min-w-[980px]">
+          <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700">
+            <div className="col-span-2">Title</div>
+            <div className="col-span-3">Notes</div>
+            <div className="col-span-2">Status</div>
+            <div className="col-span-1">Priority</div>
+            <div className="col-span-1">Assignee</div>
+            <div className="col-span-1">Start</div>
+            <div className="col-span-1">Due</div>
+            <div className="col-span-1"></div>
+          </div>
+
+          {group.items?.map((item) => (
+            <ItemRow
+              key={item.id}
+              item={item}
+              boardId={boardId}
+              workspaceMembers={workspaceMembers}
+              isRetainerBoard={isRetainerBoard}
+              isArchivedView={isArchivedView}
+            />
+          ))}
+
+          {!isArchivedView && isAddingItem ? (
+            <form onSubmit={handleAddItem} className="px-4 py-3 border-t border-gray-100">
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={newItemTitle}
+                  onChange={(e) => setNewItemTitle(e.target.value)}
+                  placeholder="Item title..."
+                  className="input flex-1"
+                  autoFocus
+                />
+                <button type="submit" className="btn btn-primary">
+                  Add
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAddingItem(false);
+                    setNewItemTitle('');
+                  }}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : !isArchivedView ? (
+            <button
+              onClick={() => setIsAddingItem(true)}
+              className="w-full px-4 py-3 text-left text-gray-600 hover:bg-gray-50 flex items-center space-x-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Item</span>
+            </button>
+          ) : null}
         </div>
-
-        {group.items?.map((item) => (
-          <ItemRow
-            key={item.id}
-            item={item}
-            boardId={boardId}
-            workspaceMembers={workspaceMembers}
-            isRetainerBoard={isRetainerBoard}
-            isArchivedView={isArchivedView}
-          />
-        ))}
-
-        {!isArchivedView && isAddingItem ? (
-          <form onSubmit={handleAddItem} className="px-4 py-3 border-t border-gray-100">
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                value={newItemTitle}
-                onChange={(e) => setNewItemTitle(e.target.value)}
-                placeholder="Item title..."
-                className="input flex-1"
-                autoFocus
-              />
-              <button type="submit" className="btn btn-primary">
-                Add
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsAddingItem(false);
-                  setNewItemTitle('');
-                }}
-                className="btn btn-secondary"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        ) : !isArchivedView ? (
-          <button
-            onClick={() => setIsAddingItem(true)}
-            className="w-full px-4 py-3 text-left text-gray-600 hover:bg-gray-50 flex items-center space-x-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Item</span>
-          </button>
-        ) : null}
       </div>
     </div>
   );

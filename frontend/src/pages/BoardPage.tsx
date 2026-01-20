@@ -115,7 +115,7 @@ export const BoardPage: React.FC = () => {
         <span>Back to {board.workspace?.name}</span>
       </button>
 
-      <div className="flex justify-between items-start mb-8">
+      <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-start mb-8">
         <div>
           <div className="flex items-center space-x-3">
             {isEditingName ? (
@@ -161,8 +161,8 @@ export const BoardPage: React.FC = () => {
             <p className="text-gray-600 mt-2">{board.description}</p>
           )}
         </div>
-        <div className="flex space-x-3">
-          <div className="flex bg-gray-100 rounded-lg p-1">
+        <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode('table')}
               className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
@@ -172,7 +172,7 @@ export const BoardPage: React.FC = () => {
               }`}
             >
               <LayoutGrid className="w-4 h-4" />
-              <span>Table</span>
+              <span className="hidden sm:inline">Table</span>
             </button>
             <button
               onClick={() => setViewMode('timeline')}
@@ -183,7 +183,7 @@ export const BoardPage: React.FC = () => {
               }`}
             >
               <Calendar className="w-4 h-4" />
-              <span>Timeline</span>
+              <span className="hidden sm:inline">Timeline</span>
             </button>
             <button
               onClick={() => setViewMode('retainer')}
@@ -195,7 +195,7 @@ export const BoardPage: React.FC = () => {
               disabled={!board.isRetainer}
             >
               <Clock className="w-4 h-4" />
-              <span>Retainer</span>
+              <span className="hidden sm:inline">Retainer</span>
             </button>
             <button
               onClick={() => setViewMode('archived')}
@@ -206,7 +206,7 @@ export const BoardPage: React.FC = () => {
               }`}
             >
               <Archive className="w-4 h-4" />
-              <span>Archived</span>
+              <span className="hidden sm:inline">Archived</span>
             </button>
           </div>
         </div>
