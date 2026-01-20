@@ -9,7 +9,9 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  // url      = "file:app.db"
+  url      = "file:../data/app.db"
+  // Si cambia este valor cambiarlo en .env para correrlo en local
 }
 
 model User {

@@ -125,7 +125,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
   const currentPriority = priorityOptions.find(p => p.value === item.priority) || priorityOptions[1];
 
   return (
-    <div className="grid grid-cols-12 gap-4 py-3 px-4 hover:bg-gray-50 border-b border-gray-100 items-center min-w-[980px]">
+    <div className="grid grid-cols-12 gap-4 py-3 px-4 hover:bg-gray-50 border-b border-gray-100 items-center">
       <div className="col-span-2">
         {isEditing && !readOnly ? (
           <input

@@ -134,7 +134,7 @@ export const WorkspaceDetailPage: React.FC = () => {
         <span>Back to Workspaces</span>
       </button>
 
-      <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-start mb-8">
+      <div className="flex justify-between items-start mb-8">
         <div>
           <div className="flex items-center space-x-3">
             {isEditingName ? (
@@ -192,8 +192,8 @@ export const WorkspaceDetailPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <div className="flex flex-wrap bg-gray-100 rounded-lg p-1">
+        <div className="flex space-x-3">
+          <div className="flex bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode('boards')}
               className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
@@ -203,7 +203,7 @@ export const WorkspaceDetailPage: React.FC = () => {
               }`}
             >
               <FolderKanban className="w-4 h-4" />
-              <span className="hidden sm:inline">Boards</span>
+              <span>Boards</span>
             </button>
             <button
               onClick={() => setViewMode('roadmap')}
@@ -214,7 +214,7 @@ export const WorkspaceDetailPage: React.FC = () => {
               }`}
             >
               <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">Roadmap</span>
+              <span>Roadmap</span>
             </button>
           </div>
           {isOwner && (
