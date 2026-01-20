@@ -177,7 +177,7 @@ export const updateItem = async (req: AuthRequest, res: Response) => {
     const previousStatus = item.status;
 
     if (statusChanged) {
-      if (status === 'done') {
+      if (status === 'complete') {
         if (isRetainerBoard && (retainerHours === undefined || retainerHours === null)) {
           return res.status(400).json({ error: 'Retainer hours are required to complete this task' });
         }
@@ -353,7 +353,10 @@ export const getMyItems = async (req: AuthRequest, res: Response) => {
     const items = await prisma.item.findMany({
       where: {
         assignedTo: userId,
-        isArchived: false
+        isArchived: false,
+        status: {
+          notIn: ['done', 'complete']
+        }
       },
       include: {
         group: {

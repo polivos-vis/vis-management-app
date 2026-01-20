@@ -8,6 +8,7 @@ export const Layout: React.FC = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
+  const appVersion = import.meta.env.VITE_APP_VERSION || 'dev';
 
   const handleLogout = () => {
     logout();
@@ -108,6 +109,9 @@ export const Layout: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
       </main>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
+        <div className="text-xs text-gray-400 text-right">v{appVersion}</div>
+      </div>
     </div>
   );
 };

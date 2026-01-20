@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import { Group, Item, Comment, ActivityLog, Notification } from '../types';
+import { Group, Item, Comment, ActivityLog, Notification, ChecklistItem } from '../types';
 
 export const groupService = {
   create: async (data: { name: string; boardId: string; color?: string }): Promise<Group> => {
@@ -85,6 +85,27 @@ export const commentService = {
 
   delete: async (id: string): Promise<void> => {
     await api.delete(`/comments/${id}`);
+  },
+};
+
+export const checklistService = {
+  getByItem: async (itemId: string): Promise<ChecklistItem[]> => {
+    const response = await api.get(`/checklists/item/${itemId}`);
+    return response.data;
+  },
+
+  create: async (data: { itemId: string; text: string }): Promise<ChecklistItem> => {
+    const response = await api.post('/checklists', data);
+    return response.data;
+  },
+
+  update: async (id: string, data: { text?: string; isDone?: boolean }): Promise<ChecklistItem> => {
+    const response = await api.put(`/checklists/${id}`, data);
+    return response.data;
+  },
+
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/checklists/${id}`);
   },
 };
 

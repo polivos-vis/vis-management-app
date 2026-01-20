@@ -9,6 +9,7 @@ import itemRoutes from './routes/item.routes';
 import commentRoutes from './routes/comment.routes';
 import activityRoutes from './routes/activity.routes';
 import notificationRoutes from './routes/notification.routes';
+import checklistRoutes from './routes/checklist.routes';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use('/api/items', itemRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/checklists', checklistRoutes);
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);

@@ -114,6 +114,7 @@ model Item {
   group        Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
   assignedUser User?         @relation("AssignedItems", fields: [assignedTo], references: [id], onDelete: SetNull)
   comments     Comment[]
+  checklistItems ChecklistItem[]
   activityLogs ActivityLog[]
 
   @@map("items")
@@ -131,6 +132,20 @@ model Comment {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("comments")
+}
+
+model ChecklistItem {
+  id        String   @id @default(cuid())
+  itemId    String
+  text      String
+  isDone    Boolean  @default(false)
+  position  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("checklist_items")
 }
 
 model ActivityLog {

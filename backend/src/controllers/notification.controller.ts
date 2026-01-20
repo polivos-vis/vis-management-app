@@ -159,7 +159,7 @@ export const checkUpcomingTasks = async (req: AuthRequest, res: Response) => {
           not: null,
         },
         status: {
-          not: 'done',
+          notIn: ['done', 'complete'],
         },
       },
       include: {

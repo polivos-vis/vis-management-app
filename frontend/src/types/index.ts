@@ -113,6 +113,16 @@ export interface Comment {
   updatedAt: string;
 }
 
+export interface ChecklistItem {
+  id: string;
+  itemId: string;
+  text: string;
+  isDone: boolean;
+  position: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ActivityLog {
   id: string;
   action: string;
@@ -145,5 +155,5 @@ export interface BoardRoadmapEntry {
   endDate: string;
 }
 
-export type StatusType = 'todo' | 'in_progress' | 'done' | 'stuck';
+export type StatusType = 'todo' | 'in_progress' | 'done' | 'complete' | 'stuck';
 export type PriorityType = 'low' | 'medium' | 'high' | 'critical';

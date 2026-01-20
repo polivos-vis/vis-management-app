@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Item, User } from '../types';
-import { Trash2 } from 'lucide-react';
+import { FileText, Trash2 } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { itemService } from '../services';
+import { ItemDetailsModal } from './ItemDetailsModal';
 
 interface ItemRowProps {
   item: Item;
@@ -15,7 +16,8 @@ interface ItemRowProps {
 const statusOptions = [
   { value: 'todo', label: 'To Do', color: 'bg-gray-100 text-gray-700' },
   { value: 'in_progress', label: 'In Progress', color: 'bg-blue-100 text-blue-700' },
-  { value: 'done', label: 'Done', color: 'bg-green-100 text-green-700' },
+  { value: 'done', label: 'Done', color: 'bg-emerald-100 text-emerald-700' },
+  { value: 'complete', label: 'Complete', color: 'bg-green-100 text-green-700' },
   { value: 'stuck', label: 'Stuck', color: 'bg-red-100 text-red-700' },
 ];
 
@@ -29,8 +31,7 @@ const priorityOptions = [
 export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMembers, isRetainerBoard, isArchivedView }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(item.title);
-  const [isEditingNotes, setIsEditingNotes] = useState(false);
-  const [notes, setNotes] = useState(item.notes || '');
+  const [showDetails, setShowDetails] = useState(false);
   const [showHoursModal, setShowHoursModal] = useState(false);
   const [hoursValue, setHoursValue] = useState(
     item.retainerHours !== null && item.retainerHours !== undefined ? String(item.retainerHours) : ''
@@ -61,15 +62,9 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
     setIsEditing(false);
   };
 
-  const handleNotesSave = () => {
-    if (notes !== item.notes) {
-      updateMutation.mutate({ notes: notes.trim() ? notes : null });
-    }
-    setIsEditingNotes(false);
-  };
 
   const handleStatusChange = (status: string) => {
-    if (isRetainerBoard && status === 'done') {
+    if (isRetainerBoard && status === 'complete') {
       setShowHoursModal(true);
       return;
     }
@@ -92,34 +87,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
     }
   };
 
-  useEffect(() => {
-    setNotes(item.notes || '');
-  }, [item.notes]);
-
-  const renderNotes = (value: string) => {
-    if (!value) {
-      return <span className="text-gray-400 text-sm">Add notes</span>;
-    }
-
-    const parts = value.split(/(https?:\/\/[^\s]+)/g);
-    return parts.map((part, index) => {
-      if (part.match(/^https?:\/\/[^\s]+$/)) {
-        return (
-          <a
-            key={`${part}-${index}`}
-            href={part}
-            target="_blank"
-            rel="noreferrer"
-            className="text-primary-600 hover:underline"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {part}
-          </a>
-        );
-      }
-      return <span key={`${part}-${index}`}>{part}</span>;
-    });
-  };
+  const hasNotes = Boolean(item.description || item.notes);
 
   const currentStatus = statusOptions.find(s => s.value === item.status) || statusOptions[0];
   const currentPriority = priorityOptions.find(p => p.value === item.priority) || priorityOptions[1];
@@ -158,30 +126,14 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
       </div>
 
       <div className="col-span-3">
-        {isEditingNotes && !readOnly ? (
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            onBlur={handleNotesSave}
-            rows={2}
-            className="input py-1 text-sm resize-none"
-            autoFocus
-          />
-        ) : (
-          <div
-            onClick={() => {
-              if (!readOnly) {
-                setIsEditingNotes(true);
-              }
-            }}
-            className={`text-sm text-gray-600 max-h-12 overflow-hidden ${
-              readOnly ? 'cursor-default' : 'cursor-text'
-            }`}
-            title={item.notes || ''}
-          >
-            {renderNotes(item.notes || '')}
-          </div>
-        )}
+        <button
+          type="button"
+          onClick={() => setShowDetails(true)}
+          className={`text-sm ${hasNotes ? 'text-primary-600' : 'text-gray-500'} hover:underline flex items-center space-x-2`}
+        >
+          <FileText className="w-4 h-4" />
+          <span>Notes</span>
+        </button>
       </div>
 
       <div className="col-span-2">
@@ -266,12 +218,21 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
         )}
       </div>
 
+      {showDetails && (
+        <ItemDetailsModal
+          item={item}
+          isOpen={showDetails}
+          onClose={() => setShowDetails(false)}
+          boardId={boardId}
+        />
+      )}
+
       {showHoursModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Log Hours</h2>
             <p className="text-sm text-gray-600 mb-4">
-              Add the hours spent before marking this task as done.
+              Add the hours spent before marking this task as complete.
             </p>
             <div className="space-y-4">
               <div>
@@ -306,7 +267,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
                     if (!Number.isFinite(parsedHours)) {
                       return;
                     }
-                    updateMutation.mutate({ status: 'done', retainerHours: parsedHours });
+                    updateMutation.mutate({ status: 'complete', retainerHours: parsedHours });
                     setShowHoursModal(false);
                   }}
                   className="flex-1 btn btn-primary"

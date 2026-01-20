@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { itemService } from '../services';
 import { Calendar, CheckCircle2, AlertTriangle } from 'lucide-react';
@@ -8,9 +8,6 @@ import { Item } from '../types';
 export const MyTasksPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [hoursItem, setHoursItem] = useState<Item | null>(null);
-  const [hoursValue, setHoursValue] = useState('');
-
   const { data: items, isLoading } = useQuery({
     queryKey: ['my-items'],
     queryFn: itemService.getMyItems,
@@ -67,12 +64,6 @@ export const MyTasksPage: React.FC = () => {
   }, [items, today]);
 
   const handleStatusChange = (item: Item, status: string) => {
-    const isRetainer = item.group?.board?.isRetainer;
-    if (isRetainer && status === 'done') {
-      setHoursItem(item);
-      setHoursValue(item.retainerHours !== null && item.retainerHours !== undefined ? String(item.retainerHours) : '');
-      return;
-    }
     updateStatusMutation.mutate({ id: item.id, data: { status } });
   };
 
@@ -182,61 +173,6 @@ export const MyTasksPage: React.FC = () => {
         </div>
       )}
 
-      {hoursItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Log Hours</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Add the hours spent before marking this task as done.
-            </p>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hours
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.25"
-                  value={hoursValue}
-                  onChange={(e) => setHoursValue(e.target.value)}
-                  className="input"
-                  placeholder="e.g. 3.5"
-                />
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setHoursItem(null)}
-                  className="flex-1 btn btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (hoursValue.trim() === '') {
-                      return;
-                    }
-                    const parsedHours = Number(hoursValue);
-                    if (!Number.isFinite(parsedHours)) {
-                      return;
-                    }
-                    updateStatusMutation.mutate({
-                      id: hoursItem.id,
-                      data: { status: 'done', retainerHours: parsedHours }
-                    });
-                    setHoursItem(null);
-                  }}
-                  className="flex-1 btn btn-primary"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
