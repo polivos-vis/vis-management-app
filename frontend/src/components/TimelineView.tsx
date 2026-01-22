@@ -151,9 +151,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ board, allMembers })
 
       <div className="overflow-x-auto">
         <div className="inline-block" style={{ minWidth: labelWidth + timelineWidth }}>
-          <div className="flex border-b border-gray-200 bg-gray-50">
+          <div className="flex border-b border-gray-200 bg-secondary-50">
             <div
-              className="sticky left-0 z-30 border-r border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 bg-gray-50"
+              className="sticky left-0 z-30 border-r border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 bg-secondary-50"
               style={{ width: labelWidth }}
             >
               Task
@@ -181,7 +181,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ board, allMembers })
                 <div
                   key={`${cell.labelNum}-${index}`}
                   className={`border-r border-gray-200 text-[10px] text-gray-500 flex flex-col items-center py-1 ${
-                    cell.isWeekend ? 'bg-gray-50' : ''
+                    cell.isWeekend ? 'bg-secondary-50' : ''
                   }`}
                   style={{ width: cellWidth }}
                 >
@@ -195,9 +195,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ board, allMembers })
           <div>
             {timelineGroups.map((group) => (
               <div key={group.id} className="border-b border-gray-200">
-                <div className="flex bg-gray-50">
+                <div className="flex bg-secondary-50">
                   <div
-                    className="sticky left-0 z-20 border-r border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 bg-gray-50"
+                    className="sticky left-0 z-20 border-r border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 bg-secondary-50"
                     style={{ width: labelWidth }}
                   >
                     {group.name}
@@ -207,7 +207,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ board, allMembers })
                       {dayCells.map((cell, index) => (
                         <div
                           key={`group-cell-${group.id}-${index}`}
-                          className={`border-r border-gray-100 h-full ${cell.isWeekend ? 'bg-gray-50' : ''}`}
+                          className={`border-r border-gray-100 h-full ${cell.isWeekend ? 'bg-secondary-50' : ''}`}
                           style={{ width: cellWidth }}
                         />
                       ))}
@@ -235,7 +235,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ board, allMembers })
                           {dayCells.map((cell, index) => (
                             <div
                               key={`cell-${item.id}-${index}`}
-                              className={`border-r border-gray-100 h-full ${cell.isWeekend ? 'bg-gray-50' : ''}`}
+                              className={`border-r border-gray-100 h-full ${cell.isWeekend ? 'bg-secondary-50' : ''}`}
                               style={{ width: cellWidth }}
                             />
                           ))}

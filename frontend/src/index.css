@@ -13,7 +13,7 @@
 }
 
 .desc-editor a {
-  color: #2563eb;
+  color: #1cbc52;
   text-decoration: underline;
   cursor: pointer;
 }
@@ -32,7 +32,7 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-secondary-50 text-secondary-900;
   }
 }
 
@@ -42,11 +42,11 @@
   }
   
   .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800;
+    @apply bg-primary-500 text-secondary-900 hover:bg-primary-600 active:bg-primary-700 shadow-[0_8px_18px_rgba(90,255,132,0.35)] hover:shadow-[0_10px_24px_rgba(90,255,132,0.45)];
   }
   
   .btn-secondary {
-    @apply bg-gray-200 text-gray-700 hover:bg-gray-300 active:bg-gray-400;
+    @apply bg-secondary-100 text-secondary-800 hover:bg-secondary-200 active:bg-secondary-300;
   }
   
   .btn-danger {
@@ -54,10 +54,10 @@
   }
   
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-3 py-2 border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-transparent;
   }
   
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4;
+    @apply bg-secondary-50 rounded-lg shadow-[0_10px_24px_rgba(15,21,19,0.08)] border border-secondary-200 p-4;
   }
 }

@@ -82,7 +82,7 @@ export const GroupComponent: React.FC<GroupComponentProps> = ({
                     updateGroupMutation.mutate({ name: groupName });
                   }
                 }}
-                className="text-primary-600 hover:text-primary-700"
+                className="text-primary-700 hover:text-primary-800"
                 title="Save"
               >
                 <Check className="w-4 h-4" />
@@ -127,7 +127,7 @@ export const GroupComponent: React.FC<GroupComponentProps> = ({
 
       <div className="card !p-0 overflow-x-auto">
         <div className="min-w-[980px]">
-          <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-700">
+          <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-secondary-50 border-b border-gray-200 text-sm font-medium text-gray-700">
             <div className="col-span-2">Title</div>
             <div className="col-span-3">Notes</div>
             <div className="col-span-2">Status</div>
@@ -178,7 +178,7 @@ export const GroupComponent: React.FC<GroupComponentProps> = ({
           ) : !isArchivedView ? (
             <button
               onClick={() => setIsAddingItem(true)}
-              className="w-full px-4 py-3 text-left text-gray-600 hover:bg-gray-50 flex items-center space-x-2"
+              className="w-full px-4 py-3 text-left text-gray-600 hover:bg-secondary-50 flex items-center space-x-2"
             >
               <Plus className="w-4 h-4" />
               <span>Add Item</span>

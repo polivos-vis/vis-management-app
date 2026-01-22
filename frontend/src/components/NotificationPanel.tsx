@@ -58,11 +58,11 @@ export const NotificationPanel: React.FC = () => {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'assignment':
-        return <Bell className="w-4 h-4 text-blue-600" />;
+        return <Bell className="w-4 h-4 text-primary-700" />;
       case 'reminder':
-        return <Calendar className="w-4 h-4 text-orange-600" />;
+        return <Calendar className="w-4 h-4 text-accent-700" />;
       default:
-        return <Bell className="w-4 h-4 text-gray-600" />;
+        return <Bell className="w-4 h-4 text-secondary-600" />;
     }
   };
 
@@ -85,7 +85,7 @@ export const NotificationPanel: React.FC = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+        className="relative p-2 text-primary-700 hover:bg-primary-50 rounded-lg transition-colors"
       >
         <Bell className="w-5 h-5" />
         {unreadCount && unreadCount > 0 ? (
@@ -107,7 +107,7 @@ export const NotificationPanel: React.FC = () => {
               {notifications && notifications.some(n => !n.isRead) && (
                 <button
                   onClick={() => markAllAsReadMutation.mutate()}
-                  className="text-sm text-primary-600 hover:text-primary-700"
+                  className="text-sm text-primary-700 hover:text-primary-800"
                 >
                   Mark all as read
                 </button>
@@ -120,8 +120,8 @@ export const NotificationPanel: React.FC = () => {
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                        !notification.isRead ? 'bg-blue-50' : ''
+                      className={`p-4 hover:bg-secondary-50 cursor-pointer transition-colors ${
+                        !notification.isRead ? 'bg-accent-50' : ''
                       }`}
                       onClick={() => handleNotificationClick(notification)}
                     >

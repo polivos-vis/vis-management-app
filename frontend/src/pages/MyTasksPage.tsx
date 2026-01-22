@@ -70,7 +70,7 @@ export const MyTasksPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-700"></div>
       </div>
     );
   }
@@ -80,7 +80,7 @@ export const MyTasksPage: React.FC = () => {
       <div className="flex items-start gap-3">
         <input
           type="checkbox"
-          className="mt-1 h-5 w-5 rounded-full border-gray-300 text-primary-600 focus:ring-primary-500"
+          className="mt-1 h-5 w-5 rounded-full border-secondary-300 text-primary-700 focus:ring-primary-600"
           onClick={(e) => e.stopPropagation()}
           onChange={() => handleStatusChange(item, 'done')}
         />

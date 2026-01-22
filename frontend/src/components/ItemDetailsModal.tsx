@@ -293,7 +293,7 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
                     createChecklistMutation.mutate({ itemId: item.id, text: newChecklistText.trim() });
                   }
                 }}
-                className="text-sm text-primary-600 hover:text-primary-700 flex items-center space-x-2"
+                className="text-sm text-primary-700 hover:text-primary-800 flex items-center space-x-2"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add item</span>
@@ -301,7 +301,7 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
             </div>
             <div className="space-y-2">
               {(checklist || []).map((checkItem: ChecklistItem) => (
-                <div key={checkItem.id} className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+                <div key={checkItem.id} className="flex items-center justify-between bg-secondary-50 rounded-lg px-3 py-2">
                   <label className="flex items-center gap-3 text-sm text-gray-700 flex-1">
                     <input
                       type="checkbox"
@@ -351,7 +351,7 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
             </div>
             <div className="space-y-3">
               {(comments || []).map((comment: Comment) => (
-                <div key={comment.id} className="bg-gray-50 rounded-lg p-3">
+                <div key={comment.id} className="bg-secondary-50 rounded-lg p-3">
                   <p className="text-sm text-gray-700">{comment.content}</p>
                   <p className="text-xs text-gray-500 mt-2">
                     {comment.user?.name || 'User'} · {new Date(comment.createdAt).toLocaleDateString()}

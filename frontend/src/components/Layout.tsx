@@ -20,14 +20,14 @@ export const Layout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-secondary-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
               <Link to="/" className="flex items-center space-x-2">
-                <LayoutDashboard className="w-8 h-8 text-primary-600" />
-                <span className="text-xl font-bold text-gray-900">Monday Clone</span>
+                <LayoutDashboard className="w-8 h-8 text-primary-700" />
+                <span className="text-xl font-bold tracking-[0.22em] text-gray-900">INSIDEM</span>
               </Link>
               
               <nav className="hidden md:flex space-x-4">
@@ -35,7 +35,7 @@ export const Layout: React.FC = () => {
                   to="/workspaces"
                   className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
                     isActive('/workspaces')
-                      ? 'bg-primary-50 text-primary-700'
+                      ? 'bg-primary-50 text-primary-800'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
@@ -46,7 +46,7 @@ export const Layout: React.FC = () => {
                   to="/my-tasks"
                   className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
                     isActive('/my-tasks')
-                      ? 'bg-primary-50 text-primary-700'
+                      ? 'bg-primary-50 text-primary-800'
                       : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
@@ -59,8 +59,8 @@ export const Layout: React.FC = () => {
             <div className="flex items-center space-x-4">
               <NotificationPanel />
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
-                  <span className="text-white font-medium text-sm">
+                <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                  <span className="text-secondary-900 font-semibold text-sm">
                     {user?.name?.charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -83,7 +83,7 @@ export const Layout: React.FC = () => {
                 to="/workspaces"
                 className={`flex-1 flex items-center justify-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
                   isActive('/workspaces')
-                    ? 'bg-primary-50 text-primary-700'
+                    ? 'bg-primary-50 text-primary-800'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -94,7 +94,7 @@ export const Layout: React.FC = () => {
                 to="/my-tasks"
                 className={`flex-1 flex items-center justify-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
                   isActive('/my-tasks')
-                    ? 'bg-primary-50 text-primary-700'
+                    ? 'bg-primary-50 text-primary-800'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >

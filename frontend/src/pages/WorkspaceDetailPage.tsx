@@ -112,7 +112,7 @@ export const WorkspaceDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-700"></div>
       </div>
     );
   }
@@ -151,7 +151,7 @@ export const WorkspaceDetailPage: React.FC = () => {
                       updateWorkspaceMutation.mutate({ name: workspaceName });
                     }
                   }}
-                  className="text-primary-600 hover:text-primary-700"
+                  className="text-primary-700 hover:text-primary-800"
                   title="Save"
                 >
                   <Check className="w-5 h-5" />
@@ -198,7 +198,7 @@ export const WorkspaceDetailPage: React.FC = () => {
               onClick={() => setViewMode('boards')}
               className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
                 viewMode === 'boards'
-                  ? 'bg-white shadow-sm text-primary-600'
+                  ? 'bg-primary-50 text-primary-800 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -209,7 +209,7 @@ export const WorkspaceDetailPage: React.FC = () => {
               onClick={() => setViewMode('roadmap')}
               className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
                 viewMode === 'roadmap'
-                  ? 'bg-white shadow-sm text-primary-600'
+                  ? 'bg-primary-50 text-primary-800 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -241,7 +241,7 @@ export const WorkspaceDetailPage: React.FC = () => {
           <>
             {isLoadingRoadmap ? (
               <div className="flex items-center justify-center h-48">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-700"></div>
               </div>
             ) : (
               <WorkspaceRoadmapView entries={roadmapEntries || []} />
@@ -333,7 +333,7 @@ export const WorkspaceDetailPage: React.FC = () => {
                     type="checkbox"
                     checked={boardIsRetainer}
                     onChange={(e) => setBoardIsRetainer(e.target.checked)}
-                    className="h-4 w-4"
+                    className="h-4 w-4 text-primary-700 focus:ring-primary-600 border-secondary-300"
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
@@ -480,7 +480,7 @@ export const WorkspaceDetailPage: React.FC = () => {
                     prev ? { ...prev, isRetainer: e.target.checked } : prev
                   )
                 }
-                className="h-4 w-4"
+                className="h-4 w-4 text-primary-700 focus:ring-primary-600 border-secondary-300"
               />
             </div>
             <div className="flex space-x-3">

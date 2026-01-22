@@ -107,9 +107,9 @@ export const WorkspaceRoadmapView: React.FC<WorkspaceRoadmapViewProps> = ({ entr
 
       <div className="overflow-x-auto">
         <div className="inline-block" style={{ minWidth: labelWidth + timelineWidth }}>
-          <div className="flex border-b border-gray-200 bg-gray-50">
+          <div className="flex border-b border-gray-200 bg-secondary-50">
             <div
-              className="sticky left-0 z-30 border-r border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 bg-gray-50"
+              className="sticky left-0 z-30 border-r border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 bg-secondary-50"
               style={{ width: labelWidth }}
             >
               Board
@@ -137,7 +137,7 @@ export const WorkspaceRoadmapView: React.FC<WorkspaceRoadmapViewProps> = ({ entr
                 <div
                   key={`${cell.labelNum}-${index}`}
                   className={`border-r border-gray-200 text-[10px] text-gray-500 flex flex-col items-center py-1 ${
-                    cell.isWeekend ? 'bg-gray-50' : ''
+                    cell.isWeekend ? 'bg-secondary-50' : ''
                   }`}
                   style={{ width: cellWidth }}
                 >
@@ -168,7 +168,7 @@ export const WorkspaceRoadmapView: React.FC<WorkspaceRoadmapViewProps> = ({ entr
                       {dayCells.map((cell, index) => (
                         <div
                           key={`cell-${entry.id}-${index}`}
-                          className={`border-r border-gray-100 h-full ${cell.isWeekend ? 'bg-gray-50' : ''}`}
+                          className={`border-r border-gray-100 h-full ${cell.isWeekend ? 'bg-secondary-50' : ''}`}
                           style={{ width: cellWidth }}
                         />
                       ))}

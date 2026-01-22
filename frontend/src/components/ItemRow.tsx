@@ -15,7 +15,7 @@ interface ItemRowProps {
 
 const statusOptions = [
   { value: 'todo', label: 'To Do', color: 'bg-gray-100 text-gray-700' },
-  { value: 'in_progress', label: 'In Progress', color: 'bg-blue-100 text-blue-700' },
+  { value: 'in_progress', label: 'In Progress', color: 'bg-accent-100 text-accent-700' },
   { value: 'done', label: 'Done', color: 'bg-emerald-100 text-emerald-700' },
   { value: 'complete', label: 'Complete', color: 'bg-green-100 text-green-700' },
   { value: 'stuck', label: 'Stuck', color: 'bg-red-100 text-red-700' },
@@ -23,8 +23,8 @@ const statusOptions = [
 
 const priorityOptions = [
   { value: 'low', label: 'Low', color: 'bg-gray-100 text-gray-700' },
-  { value: 'medium', label: 'Medium', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'high', label: 'High', color: 'bg-orange-100 text-orange-700' },
+  { value: 'medium', label: 'Medium', color: 'bg-accent-100 text-accent-700' },
+  { value: 'high', label: 'High', color: 'bg-accent-200 text-accent-800' },
   { value: 'critical', label: 'Critical', color: 'bg-red-100 text-red-700' },
 ];
 
@@ -93,7 +93,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
   const currentPriority = priorityOptions.find(p => p.value === item.priority) || priorityOptions[1];
 
   return (
-    <div className="grid grid-cols-12 gap-4 py-3 px-4 hover:bg-gray-50 border-b border-gray-100 items-center min-w-[980px]">
+    <div className="grid grid-cols-12 gap-4 py-3 px-4 hover:bg-secondary-50 border-b border-gray-100 items-center min-w-[980px]">
       <div className="col-span-2">
         {isEditing && !readOnly ? (
           <input
@@ -129,7 +129,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
         <button
           type="button"
           onClick={() => setShowDetails(true)}
-          className={`text-sm ${hasNotes ? 'text-primary-600' : 'text-gray-500'} hover:underline flex items-center space-x-2`}
+          className={`text-sm ${hasNotes ? 'text-primary-700' : 'text-gray-500'} hover:underline flex items-center space-x-2`}
         >
           <FileText className="w-4 h-4" />
           <span>Notes</span>

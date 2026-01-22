@@ -28,13 +28,13 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-secondary-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <LayoutDashboard className="w-12 h-12 text-primary-600" />
+            <LayoutDashboard className="w-12 h-12 text-primary-700" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Monday Clone</h2>
+          <h2 className="text-3xl font-bold tracking-[0.22em] text-gray-900">INSIDEM</h2>
           <p className="mt-2 text-gray-600">Sign in to your account</p>
         </div>
 
@@ -88,7 +88,7 @@ export const LoginPage: React.FC = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <Link to="/register" className="text-primary-600 hover:text-primary-700 font-medium">
+              <Link to="/register" className="text-primary-700 hover:text-primary-800 font-medium">
                 Sign up
               </Link>
             </p>
