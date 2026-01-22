@@ -364,7 +364,7 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
                         </span>
                       )}
                       {!isEditing && checkItem.hours !== null && checkItem.hours !== undefined ? (
-                        <span className="text-xs font-semibold text-primary-800 bg-primary-100 px-2 py-0.5 rounded-full">
+                        <span className="text-xs font-semibold text-secondary-900 bg-primary-100 px-2 py-0.5 rounded-full">
                           {checkItem.hours}h
                         </span>
                       ) : null}
