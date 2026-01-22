@@ -375,7 +375,8 @@ export const getMyItems = async (req: AuthRequest, res: Response) => {
         },
         _count: {
           select: {
-            comments: true
+            comments: true,
+            checklistItems: true
           }
         }
       },

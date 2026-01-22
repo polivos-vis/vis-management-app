@@ -94,12 +94,12 @@ export const checklistService = {
     return response.data;
   },
 
-  create: async (data: { itemId: string; text: string }): Promise<ChecklistItem> => {
+  create: async (data: { itemId: string; text: string; hours?: number | null }): Promise<ChecklistItem> => {
     const response = await api.post('/checklists', data);
     return response.data;
   },
 
-  update: async (id: string, data: { text?: string; isDone?: boolean }): Promise<ChecklistItem> => {
+  update: async (id: string, data: { text?: string; isDone?: boolean; hours?: number | null }): Promise<ChecklistItem> => {
     const response = await api.put(`/checklists/${id}`, data);
     return response.data;
   },

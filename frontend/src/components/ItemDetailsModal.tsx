@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Bold, Italic, Link2, List, ListOrdered, Plus, Trash2, Underline, X } from 'lucide-react';
+import { Bold, Italic, Link2, List, ListOrdered, Pencil, Plus, Trash2, Underline, X } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { checklistService, commentService, itemService } from '../services';
 import { ChecklistItem, Comment, Item } from '../types';
@@ -15,7 +15,11 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
   const queryClient = useQueryClient();
   const [descriptionHtml, setDescriptionHtml] = useState(item.description || item.notes || '');
   const [newChecklistText, setNewChecklistText] = useState('');
+  const [newChecklistHours, setNewChecklistHours] = useState('');
   const [newComment, setNewComment] = useState('');
+  const [editingChecklistId, setEditingChecklistId] = useState<string | null>(null);
+  const [editingChecklistText, setEditingChecklistText] = useState('');
+  const [editingChecklistHours, setEditingChecklistHours] = useState('');
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isHoveringLink, setIsHoveringLink] = useState(false);
   const [linkTooltipPos, setLinkTooltipPos] = useState<{ x: number; y: number } | null>(null);
@@ -51,11 +55,12 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['checklist', item.id] });
       setNewChecklistText('');
+      setNewChecklistHours('');
     },
   });
 
   const updateChecklistMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { text?: string; isDone?: boolean } }) =>
+    mutationFn: ({ id, data }: { id: string; data: { text?: string; isDone?: boolean; hours?: number | null } }) =>
       checklistService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['checklist', item.id] });
@@ -84,6 +89,20 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
     updateItemMutation.mutate({ description: html });
   };
 
+  const parseHours = (value: string): number | null => {
+    if (value.trim() === '') {
+      return null;
+    }
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+      return null;
+    }
+    if (parsed < 0) {
+      return null;
+    }
+    return parsed;
+  };
+
   useEffect(() => {
     if (isOpen) {
       setDescriptionHtml(item.description || item.notes || '');
@@ -91,6 +110,7 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
         editorRef.current.innerHTML = item.description || item.notes || '';
       }
       setSaveState('idle');
+      setEditingChecklistId(null);
     }
   }, [isOpen, item.description, item.notes]);
 
@@ -290,7 +310,11 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
               <button
                 onClick={() => {
                   if (newChecklistText.trim()) {
-                    createChecklistMutation.mutate({ itemId: item.id, text: newChecklistText.trim() });
+                    createChecklistMutation.mutate({
+                      itemId: item.id,
+                      text: newChecklistText.trim(),
+                      hours: parseHours(newChecklistHours)
+                    });
                   }
                 }}
                 className="text-sm text-primary-700 hover:text-primary-800 flex items-center space-x-2"
@@ -300,30 +324,109 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
               </button>
             </div>
             <div className="space-y-2">
-              {(checklist || []).map((checkItem: ChecklistItem) => (
-                <div key={checkItem.id} className="flex items-center justify-between bg-secondary-50 rounded-lg px-3 py-2">
-                  <label className="flex items-center gap-3 text-sm text-gray-700 flex-1">
-                    <input
-                      type="checkbox"
-                      checked={checkItem.isDone}
-                      onChange={(e) =>
-                        updateChecklistMutation.mutate({ id: checkItem.id, data: { isDone: e.target.checked } })
-                      }
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className={checkItem.isDone ? 'line-through text-gray-400' : ''}>
-                      {checkItem.text}
-                    </span>
-                  </label>
-                  <button
-                    onClick={() => deleteChecklistMutation.mutate(checkItem.id)}
-                    className="text-gray-400 hover:text-red-600"
+              {(checklist || []).map((checkItem: ChecklistItem) => {
+                const isEditing = editingChecklistId === checkItem.id;
+                return (
+                  <div
+                    key={checkItem.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between bg-secondary-50 rounded-lg px-3 py-2 gap-3"
                   >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-              <div className="flex gap-2">
+                    <label className="flex flex-1 flex-wrap items-center gap-3 text-sm text-gray-700">
+                      <input
+                        type="checkbox"
+                        checked={checkItem.isDone}
+                        onChange={(e) =>
+                          updateChecklistMutation.mutate({ id: checkItem.id, data: { isDone: e.target.checked } })
+                        }
+                        className="h-4 w-4 rounded border-secondary-300"
+                      />
+                      {isEditing ? (
+                        <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                          <input
+                            type="text"
+                            value={editingChecklistText}
+                            onChange={(e) => setEditingChecklistText(e.target.value)}
+                            className="input py-1 text-sm flex-1 min-w-[12rem]"
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.25"
+                            value={editingChecklistHours}
+                            onChange={(e) => setEditingChecklistHours(e.target.value)}
+                            className="input py-1 text-sm w-full sm:w-28"
+                            placeholder="Hours"
+                          />
+                        </div>
+                      ) : (
+                        <span className={checkItem.isDone ? 'line-through text-gray-400' : ''}>
+                          {checkItem.text}
+                        </span>
+                      )}
+                      {!isEditing && checkItem.hours !== null && checkItem.hours !== undefined ? (
+                        <span className="text-xs font-semibold text-primary-800 bg-primary-100 px-2 py-0.5 rounded-full">
+                          {checkItem.hours}h
+                        </span>
+                      ) : null}
+                    </label>
+                    <div className="flex items-center gap-2 sm:pl-2">
+                      {isEditing ? (
+                        <>
+                          <button
+                            onClick={() => {
+                              const trimmedText = editingChecklistText.trim();
+                              if (!trimmedText) {
+                                return;
+                              }
+                              updateChecklistMutation.mutate({
+                                id: checkItem.id,
+                                data: {
+                                  text: trimmedText,
+                                  hours: parseHours(editingChecklistHours)
+                                }
+                              });
+                              setEditingChecklistId(null);
+                            }}
+                            className="text-primary-700 hover:text-primary-800 text-xs font-semibold"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => setEditingChecklistId(null)}
+                            className="text-gray-400 hover:text-gray-600 text-xs font-semibold"
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => {
+                              setEditingChecklistId(checkItem.id);
+                              setEditingChecklistText(checkItem.text);
+                              setEditingChecklistHours(
+                                checkItem.hours !== null && checkItem.hours !== undefined ? String(checkItem.hours) : ''
+                              );
+                            }}
+                            className="text-gray-400 hover:text-primary-700"
+                            title="Edit"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteChecklistMutation.mutate(checkItem.id)}
+                            className="text-gray-400 hover:text-red-600"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={newChecklistText}
@@ -331,10 +434,23 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen
                   className="input flex-1"
                   placeholder="Add checklist item..."
                 />
+                <input
+                  type="number"
+                  min="0"
+                  step="0.25"
+                  value={newChecklistHours}
+                  onChange={(e) => setNewChecklistHours(e.target.value)}
+                  className="input w-full sm:w-28"
+                  placeholder="Hours"
+                />
                 <button
                   onClick={() => {
                     if (newChecklistText.trim()) {
-                      createChecklistMutation.mutate({ itemId: item.id, text: newChecklistText.trim() });
+                      createChecklistMutation.mutate({
+                        itemId: item.id,
+                        text: newChecklistText.trim(),
+                        hours: parseHours(newChecklistHours)
+                      });
                     }
                   }}
                   className="btn btn-primary"

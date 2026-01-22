@@ -139,6 +139,7 @@ model ChecklistItem {
   itemId    String
   text      String
   isDone    Boolean  @default(false)
+  hours     Float?
   position  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

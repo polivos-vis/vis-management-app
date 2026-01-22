@@ -34,7 +34,7 @@ export const LoginPage: React.FC = () => {
           <div className="flex justify-center mb-4">
             <LayoutDashboard className="w-12 h-12 text-primary-700" />
           </div>
-          <h2 className="text-3xl font-bold tracking-[0.22em] text-gray-900">INSIDEM</h2>
+          <h2 className="text-3xl font-bold tracking-[0.22em] text-gray-900">INSAIDEM</h2>
           <p className="mt-2 text-gray-600">Sign in to your account</p>
         </div>
 

@@ -53,11 +53,15 @@ export const getChecklistByItem = async (req: AuthRequest, res: Response) => {
 
 export const createChecklistItem = async (req: AuthRequest, res: Response) => {
   try {
-    const { itemId, text } = req.body;
+    const { itemId, text, hours } = req.body;
     const userId = req.userId!;
 
     if (!itemId || !text) {
       return res.status(400).json({ error: 'ItemId and text are required' });
+    }
+
+    if (hours !== undefined && (typeof hours !== 'number' || Number.isNaN(hours) || hours < 0)) {
+      return res.status(400).json({ error: 'Hours must be a non-negative number' });
     }
 
     const hasAccess = await hasItemAccess(itemId, userId);
@@ -75,7 +79,8 @@ export const createChecklistItem = async (req: AuthRequest, res: Response) => {
       data: {
         itemId,
         text,
-        position: (maxPosition?.position || 0) + 1
+        position: (maxPosition?.position || 0) + 1,
+        ...(hours !== undefined && { hours })
       }
     });
 
@@ -89,7 +94,7 @@ export const createChecklistItem = async (req: AuthRequest, res: Response) => {
 export const updateChecklistItem = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { text, isDone } = req.body;
+    const { text, isDone, hours } = req.body;
     const userId = req.userId!;
 
     const checklistItem = await prisma.checklistItem.findUnique({
@@ -105,6 +110,10 @@ export const updateChecklistItem = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Checklist item not found' });
     }
 
+    if (hours !== undefined && (typeof hours !== 'number' || Number.isNaN(hours) || hours < 0)) {
+      return res.status(400).json({ error: 'Hours must be a non-negative number' });
+    }
+
     const hasAccess = await hasItemAccess(checklistItem.itemId, userId);
     if (!hasAccess) {
       return res.status(403).json({ error: 'Access denied to this item' });
@@ -114,7 +123,8 @@ export const updateChecklistItem = async (req: AuthRequest, res: Response) => {
       where: { id },
       data: {
         ...(text !== undefined && { text }),
-        ...(isDone !== undefined && { isDone })
+        ...(isDone !== undefined && { isDone }),
+        ...(hours !== undefined && { hours })
       }
     });
 

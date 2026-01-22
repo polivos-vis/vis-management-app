@@ -27,7 +27,7 @@ export const Layout: React.FC = () => {
             <div className="flex items-center space-x-8">
               <Link to="/" className="flex items-center space-x-2">
                 <LayoutDashboard className="w-8 h-8 text-primary-700" />
-                <span className="text-xl font-bold tracking-[0.22em] text-gray-900">INSIDEM</span>
+                <span className="text-xl font-bold tracking-[0.22em] text-gray-900">INSAIDEM</span>
               </Link>
               
               <nav className="hidden md:flex space-x-4">

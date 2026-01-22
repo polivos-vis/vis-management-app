@@ -100,6 +100,7 @@ export interface Item {
   updatedAt: string;
   _count?: {
     comments: number;
+    checklistItems?: number;
   };
 }
 
@@ -118,6 +119,7 @@ export interface ChecklistItem {
   itemId: string;
   text: string;
   isDone: boolean;
+  hours?: number | null;
   position: number;
   createdAt: string;
   updatedAt: string;

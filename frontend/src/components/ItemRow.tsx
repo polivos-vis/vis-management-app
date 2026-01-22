@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Item, User } from '../types';
 import { FileText, Trash2 } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { itemService } from '../services';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { checklistService, itemService } from '../services';
 import { ItemDetailsModal } from './ItemDetailsModal';
 
 interface ItemRowProps {
@@ -38,6 +38,23 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
   );
   const queryClient = useQueryClient();
   const readOnly = isArchivedView === true;
+
+  const { data: checklistForHours } = useQuery({
+    queryKey: ['checklist', item.id],
+    queryFn: () => checklistService.getByItem(item.id),
+    enabled: showHoursModal
+  });
+
+  const checklistHoursTotal = (checklistForHours || []).reduce((total, checkItem) => {
+    return total + (checkItem.hours || 0);
+  }, 0);
+
+  useEffect(() => {
+    if (!showHoursModal) return;
+    if (hoursValue.trim() !== '') return;
+    if (checklistHoursTotal <= 0) return;
+    setHoursValue(String(checklistHoursTotal));
+  }, [showHoursModal, hoursValue, checklistHoursTotal]);
 
   const updateMutation = useMutation({
     mutationFn: (data: any) => itemService.update(item.id, data),
@@ -87,7 +104,12 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
     }
   };
 
-  const hasNotes = Boolean(item.description || item.notes);
+  const hasNotes = Boolean(
+    item.description ||
+    item.notes ||
+    (item._count?.comments || 0) > 0 ||
+    (item._count?.checklistItems || 0) > 0
+  );
 
   const currentStatus = statusOptions.find(s => s.value === item.status) || statusOptions[0];
   const currentPriority = priorityOptions.find(p => p.value === item.priority) || priorityOptions[1];
@@ -248,6 +270,11 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
                   className="input"
                   placeholder="e.g. 3.5"
                 />
+                {checklistHoursTotal > 0 ? (
+                  <p className="mt-2 text-xs text-secondary-600">
+                    Suggested from checklist: {checklistHoursTotal}h
+                  </p>
+                ) : null}
               </div>
               <div className="flex space-x-3">
                 <button
