@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Item, User } from '../types';
 import { FileText, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -8,6 +8,7 @@ import { ItemDetailsModal } from './ItemDetailsModal';
 interface ItemRowProps {
   item: Item;
   boardId: string;
+  boardDescription?: string;
   workspaceMembers: User[];
   isRetainerBoard?: boolean;
   isArchivedView?: boolean;
@@ -28,7 +29,14 @@ const priorityOptions = [
   { value: 'critical', label: 'Critical', color: 'bg-red-100 text-red-700' },
 ];
 
-export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMembers, isRetainerBoard, isArchivedView }) => {
+export const ItemRow: React.FC<ItemRowProps> = ({
+  item,
+  boardId,
+  boardDescription,
+  workspaceMembers,
+  isRetainerBoard,
+  isArchivedView
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(item.title);
   const [showDetails, setShowDetails] = useState(false);
@@ -115,8 +123,8 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
   const currentPriority = priorityOptions.find(p => p.value === item.priority) || priorityOptions[1];
 
   return (
-    <div className="grid grid-cols-12 gap-4 py-3 px-4 hover:bg-secondary-50 border-b border-gray-100 items-center min-w-[980px]">
-      <div className="col-span-2">
+    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 sm:gap-4 py-3 px-4 hover:bg-secondary-50 border-b border-gray-100 items-center sm:min-w-[980px]">
+      <div className="col-span-12 sm:col-span-2">
         {isEditing && !readOnly ? (
           <input
             type="text"
@@ -147,7 +155,8 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
         )}
       </div>
 
-      <div className="col-span-3">
+      <div className="col-span-12 sm:col-span-3">
+        <div className="text-xs text-gray-500 mb-1 sm:hidden">Notes</div>
         <button
           type="button"
           onClick={() => setShowDetails(true)}
@@ -158,7 +167,8 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
         </button>
       </div>
 
-      <div className="col-span-2">
+      <div className="col-span-12 sm:col-span-2">
+        <div className="text-xs text-gray-500 mb-1 sm:hidden">Status</div>
         <select
           value={item.status}
           onChange={(e) => handleStatusChange(e.target.value)}
@@ -173,7 +183,8 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
         </select>
       </div>
 
-      <div className="col-span-1">
+      <div className="col-span-12 sm:col-span-1">
+        <div className="text-xs text-gray-500 mb-1 sm:hidden">Priority</div>
         <select
           value={item.priority}
           onChange={(e) => handlePriorityChange(e.target.value)}
@@ -188,7 +199,8 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
         </select>
       </div>
 
-      <div className="col-span-1">
+      <div className="col-span-12 sm:col-span-1">
+        <div className="text-xs text-gray-500 mb-1 sm:hidden">Assignee</div>
         <select
           value={item.assignedTo || ''}
           onChange={(e) => handleAssigneeChange(e.target.value)}
@@ -204,7 +216,8 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
         </select>
       </div>
 
-      <div className="col-span-1">
+      <div className="col-span-12 sm:col-span-1">
+        <div className="text-xs text-gray-500 mb-1 sm:hidden">Start</div>
         <input
           type="date"
           value={item.startDate ? new Date(item.startDate).toISOString().split('T')[0] : ''}
@@ -216,7 +229,8 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
         />
       </div>
 
-      <div className="col-span-1">
+      <div className="col-span-12 sm:col-span-1">
+        <div className="text-xs text-gray-500 mb-1 sm:hidden">Due</div>
         <input
           type="date"
           value={item.dueDate ? new Date(item.dueDate).toISOString().split('T')[0] : ''}
@@ -228,7 +242,8 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
         />
       </div>
 
-      <div className="col-span-1 flex items-center justify-end space-x-2">
+      <div className="col-span-12 sm:col-span-1 flex items-center justify-start sm:justify-end space-x-2">
+        <div className="text-xs text-gray-500 mb-1 sm:hidden">Actions</div>
         {!readOnly && (
           <button
             onClick={() => deleteMutation.mutate()}
@@ -246,6 +261,7 @@ export const ItemRow: React.FC<ItemRowProps> = ({ item, boardId, workspaceMember
           isOpen={showDetails}
           onClose={() => setShowDetails(false)}
           boardId={boardId}
+          boardDescription={boardDescription}
         />
       )}
 
