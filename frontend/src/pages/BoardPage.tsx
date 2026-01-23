@@ -161,11 +161,11 @@ export const BoardPage: React.FC = () => {
             <p className="text-gray-600 mt-2">{board.description}</p>
           )}
         </div>
-          <div className="flex gap-2">
-          <div className="flex flex-nowrap bg-gray-100 rounded-lg p-1 overflow-x-auto">
+        <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setViewMode('table')}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors whitespace-nowrap ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
                 viewMode === 'table'
                   ? 'bg-primary-50 text-primary-800 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
@@ -176,7 +176,7 @@ export const BoardPage: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode('timeline')}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors whitespace-nowrap ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
                 viewMode === 'timeline'
                   ? 'bg-primary-50 text-primary-800 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
@@ -187,7 +187,7 @@ export const BoardPage: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode('retainer')}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors whitespace-nowrap ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
                 viewMode === 'retainer'
                   ? 'bg-primary-50 text-primary-800 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
@@ -199,7 +199,7 @@ export const BoardPage: React.FC = () => {
             </button>
             <button
               onClick={() => setViewMode('archived')}
-              className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors whitespace-nowrap ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md transition-colors ${
                 viewMode === 'archived'
                   ? 'bg-primary-50 text-primary-800 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
@@ -258,7 +258,6 @@ export const BoardPage: React.FC = () => {
                       key={group.id}
                       group={group}
                       boardId={board.id}
-                      boardDescription={board.description}
                       workspaceMembers={allMembers}
                       isRetainerBoard={board.isRetainer}
                       isArchivedView
@@ -285,7 +284,6 @@ export const BoardPage: React.FC = () => {
                   key={group.id}
                   group={group}
                   boardId={board.id}
-                  boardDescription={board.description}
                   workspaceMembers={allMembers}
                   isRetainerBoard={board.isRetainer}
                 />

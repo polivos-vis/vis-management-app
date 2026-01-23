@@ -11,7 +11,6 @@ interface AuthState {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
-  updateGroqApiKey: (apiKey: string) => Promise<boolean>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -64,26 +63,4 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: null, token: null, isAuthenticated: false, isLoading: false });
     }
   },
-
-  updateGroqApiKey: async (apiKey: string) => {
-    const response = await api.put<{
-      hasGroqApiKey: boolean;
-      groqApiKeyLast4?: string | null;
-      groqApiKeyPrefix?: string | null;
-    }>(
-      '/auth/ai-key',
-      { apiKey }
-    );
-    set((state) => ({
-      user: state.user
-        ? {
-            ...state.user,
-            hasGroqApiKey: response.data.hasGroqApiKey,
-            groqApiKeyLast4: response.data.groqApiKeyLast4 ?? null,
-            groqApiKeyPrefix: response.data.groqApiKeyPrefix ?? null
-          }
-        : state.user
-    }));
-    return response.data.hasGroqApiKey;
-  }
 }));

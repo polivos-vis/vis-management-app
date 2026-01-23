@@ -4,9 +4,6 @@ export interface User {
   name: string;
   avatar?: string;
   createdAt?: string;
-  hasGroqApiKey?: boolean;
-  groqApiKeyLast4?: string | null;
-  groqApiKeyPrefix?: string | null;
 }
 
 export interface AuthResponse {
@@ -158,19 +155,6 @@ export interface BoardRoadmapEntry {
   name: string;
   startDate: string;
   endDate: string;
-}
-
-export interface AiBriefResponse {
-  title?: string;
-  summary: string;
-  friendlyExplanation: string;
-  implementationNotes: string;
-  taskType: string;
-  role: string;
-  roleReason: string;
-  steps: string[];
-  acceptanceCriteria: string[];
-  questions: string[];
 }
 
 export type StatusType = 'todo' | 'in_progress' | 'done' | 'complete' | 'stuck';

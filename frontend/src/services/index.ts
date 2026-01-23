@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import { Group, Item, Comment, ActivityLog, Notification, ChecklistItem, AiBriefResponse } from '../types';
+import { Group, Item, Comment, ActivityLog, Notification, ChecklistItem } from '../types';
 
 export const groupService = {
   create: async (data: { name: string; boardId: string; color?: string }): Promise<Group> => {
@@ -147,11 +147,4 @@ export const notificationService = {
   checkReminders: async (): Promise<void> => {
     await api.get('/notifications/check-reminders');
   },
-};
-
-export const aiService = {
-  generateBrief: async (data: { inputText: string; context?: string }): Promise<AiBriefResponse> => {
-    const response = await api.post('/ai/brief', data);
-    return response.data;
-  }
 };

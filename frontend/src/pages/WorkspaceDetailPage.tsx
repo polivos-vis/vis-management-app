@@ -24,12 +24,7 @@ export const WorkspaceDetailPage: React.FC = () => {
   const [workspaceName, setWorkspaceName] = useState('');
   const [boardToDelete, setBoardToDelete] = useState<{ id: string; name: string } | null>(null);
   const [confirmBoardName, setConfirmBoardName] = useState('');
-  const [boardToConfigure, setBoardToConfigure] = useState<{
-    id: string;
-    name: string;
-    description?: string | null;
-    isRetainer?: boolean;
-  } | null>(null);
+  const [boardToConfigure, setBoardToConfigure] = useState<{ id: string; name: string; isRetainer?: boolean } | null>(null);
 
   const { data: workspace, isLoading } = useQuery({
     queryKey: ['workspace', id],
@@ -87,15 +82,8 @@ export const WorkspaceDetailPage: React.FC = () => {
   });
 
   const updateBoardMutation = useMutation({
-    mutationFn: ({
-      boardId,
-      isRetainer,
-      description
-    }: {
-      boardId: string;
-      isRetainer: boolean;
-      description?: string;
-    }) => boardService.update(boardId, { isRetainer, description }),
+    mutationFn: ({ boardId, isRetainer }: { boardId: string; isRetainer: boolean }) =>
+      boardService.update(boardId, { isRetainer }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspace', id] });
       setBoardToConfigure(null);
@@ -284,12 +272,7 @@ export const WorkspaceDetailPage: React.FC = () => {
                         <button
                           onClick={(event) => {
                             event.stopPropagation();
-                            setBoardToConfigure({
-                              id: board.id,
-                              name: board.name,
-                              description: board.description,
-                              isRetainer: board.isRetainer
-                            });
+                            setBoardToConfigure({ id: board.id, name: board.name, isRetainer: board.isRetainer });
                           }}
                           className="text-gray-400 hover:text-gray-600"
                           title="Board settings"
@@ -366,7 +349,7 @@ export const WorkspaceDetailPage: React.FC = () => {
                   onChange={(e) => setBoardDescription(e.target.value)}
                   className="input"
                   rows={3}
-                  placeholder="Example: Project type and stack (WordPress + ACF, React + Node, Shopify), hosting, SEO focus."
+                  placeholder="What's this board for?"
                 />
               </div>
               <div className="flex space-x-3">
@@ -484,22 +467,6 @@ export const WorkspaceDetailPage: React.FC = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Board Settings</h2>
             <p className="text-sm text-gray-600 mb-4">{boardToConfigure.name}</p>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description (optional)
-              </label>
-              <textarea
-                value={boardToConfigure.description || ''}
-                onChange={(e) =>
-                  setBoardToConfigure((prev) =>
-                    prev ? { ...prev, description: e.target.value } : prev
-                  )
-                }
-                className="input"
-                rows={3}
-                placeholder="Example: Project type and stack (WordPress + ACF, React + Node, Shopify), hosting, SEO focus."
-              />
-            </div>
             <div className="flex items-center justify-between mb-6">
               <div>
                 <div className="text-sm font-medium text-gray-900">Retainer Board</div>
@@ -530,7 +497,6 @@ export const WorkspaceDetailPage: React.FC = () => {
                   updateBoardMutation.mutate({
                     boardId: boardToConfigure.id,
                     isRetainer: Boolean(boardToConfigure.isRetainer),
-                    description: boardToConfigure.description || ''
                   })
                 }
                 disabled={updateBoardMutation.isPending}

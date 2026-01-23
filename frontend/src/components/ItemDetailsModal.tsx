@@ -1,28 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Bold, Italic, Link2, List, ListOrdered, Pencil, Plus, Trash2, Underline, X } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { aiService, checklistService, commentService, itemService } from '../services';
-import { AiBriefResponse, ChecklistItem, Comment, Item } from '../types';
-import { useAuthStore } from '../stores/authStore';
+import { checklistService, commentService, itemService } from '../services';
+import { ChecklistItem, Comment, Item } from '../types';
 
 interface ItemDetailsModalProps {
   item: Item;
   isOpen: boolean;
   onClose: () => void;
   boardId: string;
-  boardDescription?: string;
 }
 
-export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({
-  item,
-  isOpen,
-  onClose,
-  boardId,
-  boardDescription
-}) => {
+export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen, onClose, boardId }) => {
   const queryClient = useQueryClient();
-  const { user } = useAuthStore();
   const [_descriptionHtml, setDescriptionHtml] = useState(item.description || item.notes || '');
   const [newChecklistText, setNewChecklistText] = useState('');
   const [newChecklistHours, setNewChecklistHours] = useState('');
@@ -33,9 +23,6 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isHoveringLink, setIsHoveringLink] = useState(false);
   const [linkTooltipPos, setLinkTooltipPos] = useState<{ x: number; y: number } | null>(null);
-  const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
-  const [aiInput, setAiInput] = useState('');
-  const [aiError, setAiError] = useState<string | null>(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
 
   const { data: checklist } = useQuery({
@@ -95,10 +82,6 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({
     },
   });
 
-  const aiBriefMutation = useMutation({
-    mutationFn: (payload: { inputText: string; context?: string }) => aiService.generateBrief(payload)
-  });
-
   const handleSaveDescription = () => {
     const html = editorRef.current?.innerHTML || '';
     setDescriptionHtml(html);
@@ -118,92 +101,6 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({
       return null;
     }
     return parsed;
-  };
-
-  const escapeHtml = (value: string) =>
-    value
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-
-  const renderList = (items: string[]) =>
-    items.map((itemText) => `<li>${escapeHtml(itemText)}</li>`).join('');
-
-  const buildBriefHtml = (brief: AiBriefResponse) => {
-    const blocks: string[] = [];
-    blocks.push(`<p><strong>Resumen</strong></p><p>${escapeHtml(brief.summary)}</p>`);
-    blocks.push(
-      `<p><strong>Explicacion amigable</strong></p><p>${escapeHtml(brief.friendlyExplanation)}</p>`
-    );
-    if (brief.implementationNotes) {
-      blocks.push(
-        `<p><strong>Como se implementa</strong></p><p>${escapeHtml(brief.implementationNotes)}</p>`
-      );
-    }
-    blocks.push(`<p><strong>Tipo de tarea</strong></p><p>${escapeHtml(brief.taskType)}</p>`);
-    const roleLine = brief.roleReason
-      ? `${brief.role} - ${brief.roleReason}`
-      : brief.role;
-    blocks.push(`<p><strong>Rol sugerido</strong></p><p>${escapeHtml(roleLine)}</p>`);
-
-    if (brief.steps.length > 0) {
-      blocks.push(`<p><strong>Pasos sugeridos</strong></p><ul>${renderList(brief.steps)}</ul>`);
-    }
-    if (brief.acceptanceCriteria.length > 0) {
-      blocks.push(
-        `<p><strong>Criterios de aceptacion</strong></p><ul>${renderList(brief.acceptanceCriteria)}</ul>`
-      );
-    }
-    if (brief.questions.length > 0) {
-      blocks.push(
-        `<p><strong>Preguntas pendientes</strong></p><ul>${renderList(brief.questions)}</ul>`
-      );
-    }
-
-    return blocks.join('');
-  };
-
-  const handleGenerateBrief = async () => {
-    const trimmed = aiInput.trim();
-    if (trimmed.length < 10) {
-      setAiError('Add more detail to generate the brief.');
-      return;
-    }
-    if (!user?.hasGroqApiKey) {
-      setAiError('Configure your Groq API key before generating the brief.');
-      return;
-    }
-    setAiError(null);
-    try {
-      const brief = await aiBriefMutation.mutateAsync({
-        inputText: trimmed,
-        context: boardDescription
-      });
-      const html = buildBriefHtml(brief);
-      if (editorRef.current) {
-        editorRef.current.innerHTML = html;
-      }
-      setDescriptionHtml(html);
-      setSaveState('saving');
-      updateItemMutation.mutate({ description: html });
-      if (brief.steps.length > 0) {
-        await Promise.all(
-          brief.steps.map((step) =>
-            checklistService.create({
-              itemId: item.id,
-              text: step
-            })
-          )
-        );
-        queryClient.invalidateQueries({ queryKey: ['checklist', item.id] });
-      }
-      setAiInput('');
-      setIsAiPanelOpen(false);
-    } catch (error) {
-      setAiError('Could not generate the brief. Try again.');
-    }
   };
 
   useEffect(() => {
@@ -289,62 +186,7 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({
           <section>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold text-gray-900">Description</h3>
-              <button
-                type="button"
-                onClick={() => setIsAiPanelOpen((prev) => !prev)}
-                className="text-sm text-primary-700 hover:text-primary-800"
-              >
-                {isAiPanelOpen ? 'Hide AI brief' : 'Generate AI brief'}
-              </button>
             </div>
-            {isAiPanelOpen && (
-              <div className="mb-3 rounded-lg border border-secondary-200 bg-secondary-50 p-3 space-y-3">
-                {!user?.hasGroqApiKey && (
-                  <div className="rounded-md border border-secondary-200 bg-white p-3 text-xs text-gray-600">
-                    To generate a brief, configure your Groq API key in{' '}
-                    <Link to="/settings" className="text-primary-700 hover:text-primary-800 underline">
-                      Settings
-                    </Link>
-                    .
-                  </div>
-                )}
-                {user?.hasGroqApiKey && (
-                  <div>
-                    <label className="text-xs font-semibold text-gray-600">
-                      Paste the client request and context
-                    </label>
-                    <textarea
-                      value={aiInput}
-                      onChange={(event) => setAiInput(event.target.value)}
-                      rows={4}
-                      className="input mt-2"
-                      placeholder="Describe the request, goals, and any key details..."
-                    />
-                  </div>
-                )}
-                {aiError && <p className="text-xs text-red-600">{aiError}</p>}
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsAiPanelOpen(false);
-                      setAiError(null);
-                    }}
-                    className="btn btn-secondary"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleGenerateBrief}
-                    className="btn btn-primary"
-                    disabled={aiBriefMutation.isPending || !user?.hasGroqApiKey}
-                  >
-                  {aiBriefMutation.isPending ? 'Generating...' : 'Generate brief'}
-                  </button>
-                </div>
-              </div>
-            )}
             <div className="border border-gray-200 rounded-lg">
               <div className="flex items-center gap-2 border-b border-gray-200 px-3 py-2 text-gray-500">
                 <button
@@ -468,11 +310,10 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({
               <button
                 onClick={() => {
                   if (newChecklistText.trim()) {
-                    const hoursValue = parseHours(newChecklistHours);
                     createChecklistMutation.mutate({
                       itemId: item.id,
                       text: newChecklistText.trim(),
-                      ...(hoursValue !== null ? { hours: hoursValue } : {})
+                      hours: parseHours(newChecklistHours)
                     });
                   }
                 }}
@@ -537,12 +378,11 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({
                               if (!trimmedText) {
                                 return;
                               }
-                              const hoursValue = parseHours(editingChecklistHours);
                               updateChecklistMutation.mutate({
                                 id: checkItem.id,
                                 data: {
                                   text: trimmedText,
-                                  ...(hoursValue !== null ? { hours: hoursValue } : {})
+                                  hours: parseHours(editingChecklistHours)
                                 }
                               });
                               setEditingChecklistId(null);
@@ -606,11 +446,10 @@ export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({
                 <button
                   onClick={() => {
                     if (newChecklistText.trim()) {
-                      const hoursValue = parseHours(newChecklistHours);
                       createChecklistMutation.mutate({
                         itemId: item.id,
                         text: newChecklistText.trim(),
-                        ...(hoursValue !== null ? { hours: hoursValue } : {})
+                        hours: parseHours(newChecklistHours)
                       });
                     }
                   }}

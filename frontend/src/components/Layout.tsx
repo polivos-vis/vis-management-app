@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { LayoutDashboard, LogOut, User, Briefcase } from 'lucide-react';
@@ -9,7 +9,6 @@ export const Layout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const appVersion = import.meta.env.VITE_APP_VERSION || 'dev';
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -59,38 +58,15 @@ export const Layout: React.FC = () => {
 
             <div className="flex items-center space-x-4">
               <NotificationPanel />
-              <div
-                className="relative"
-                onMouseEnter={() => setIsUserMenuOpen(true)}
-                onMouseLeave={() => setIsUserMenuOpen(false)}
-              >
-                <button
-                  onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                  className="flex items-center space-x-2"
-                  type="button"
-                >
-                  <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                    <span className="text-secondary-900 font-semibold text-sm">
-                      {user?.name?.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <span className="hidden md:block text-sm font-medium text-gray-700">
-                    {user?.name}
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                  <span className="text-secondary-900 font-semibold text-sm">
+                    {user?.name?.charAt(0).toUpperCase()}
                   </span>
-                </button>
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 top-full pt-2 z-50">
-                    <div className="w-56 rounded-lg border border-secondary-200 bg-white shadow-lg p-2">
-                      <Link
-                        to="/settings"
-                        onClick={() => setIsUserMenuOpen(false)}
-                        className="block px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-secondary-50"
-                      >
-                        Settings
-                      </Link>
-                    </div>
-                  </div>
-                )}
+                </div>
+                <span className="hidden md:block text-sm font-medium text-gray-700">
+                  {user?.name}
+                </span>
               </div>
               <button
                 onClick={handleLogout}
