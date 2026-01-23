@@ -13,7 +13,7 @@ interface ItemDetailsModalProps {
 
 export const ItemDetailsModal: React.FC<ItemDetailsModalProps> = ({ item, isOpen, onClose, boardId }) => {
   const queryClient = useQueryClient();
-  const [descriptionHtml, setDescriptionHtml] = useState(item.description || item.notes || '');
+  const [_descriptionHtml, setDescriptionHtml] = useState(item.description || item.notes || '');
   const [newChecklistText, setNewChecklistText] = useState('');
   const [newChecklistHours, setNewChecklistHours] = useState('');
   const [newComment, setNewComment] = useState('');
