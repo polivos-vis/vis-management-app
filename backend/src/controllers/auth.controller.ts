@@ -105,7 +105,10 @@ export const getMe = async (req: AuthRequest, res: Response) => {
         email: true,
         name: true,
         avatar: true,
-        createdAt: true
+        createdAt: true,
+        groqApiKey: true,
+        groqApiKeyLast4: true,
+        groqApiKeyPrefix: true
       }
     });
 
@@ -113,9 +116,44 @@ export const getMe = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    res.json(user);
+    res.json({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+      createdAt: user.createdAt,
+      hasGroqApiKey: Boolean(user.groqApiKey),
+      groqApiKeyLast4: user.groqApiKeyLast4 || null,
+      groqApiKeyPrefix: user.groqApiKeyPrefix || null
+    });
   } catch (error) {
     console.error('GetMe error:', error);
     res.status(500).json({ error: 'Failed to get user' });
+  }
+};
+
+export const updateGroqApiKey = async (req: AuthRequest, res: Response) => {
+  try {
+    const { apiKey } = req.body as { apiKey?: string };
+    const userId = req.userId!;
+
+    const trimmedKey = typeof apiKey === 'string' ? apiKey.trim() : '';
+    const newKey = trimmedKey.length > 0 ? trimmedKey : null;
+    const newLast4 = newKey ? newKey.slice(-4) : null;
+    const newPrefix = newKey ? newKey.slice(0, 4) : null;
+
+    if (newKey && newKey.length < 10) {
+      return res.status(400).json({ error: 'API key looks too short' });
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { groqApiKey: newKey, groqApiKeyLast4: newLast4, groqApiKeyPrefix: newPrefix }
+    });
+
+    res.json({ hasGroqApiKey: Boolean(newKey), groqApiKeyLast4: newLast4, groqApiKeyPrefix: newPrefix });
+  } catch (error) {
+    console.error('Update Groq API key error:', error);
+    res.status(500).json({ error: 'Failed to update API key' });
   }
 };

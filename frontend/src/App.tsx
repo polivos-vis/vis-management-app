@@ -8,6 +8,7 @@ import { WorkspacesPage } from './pages/WorkspacesPage';
 import { WorkspaceDetailPage } from './pages/WorkspaceDetailPage';
 import { BoardPage } from './pages/BoardPage';
 import { MyTasksPage } from './pages/MyTasksPage';
+import { SettingsPage } from './pages/SettingsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,7 @@ function App() {
             <Route path="workspaces/:id" element={<WorkspaceDetailPage />} />
             <Route path="boards/:id" element={<BoardPage />} />
             <Route path="my-tasks" element={<MyTasksPage />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -8,6 +8,7 @@ import { ItemRow } from './ItemRow';
 interface GroupComponentProps {
   group: Group;
   boardId: string;
+  boardDescription?: string;
   workspaceMembers: User[];
   isRetainerBoard?: boolean;
   isArchivedView?: boolean;
@@ -16,6 +17,7 @@ interface GroupComponentProps {
 export const GroupComponent: React.FC<GroupComponentProps> = ({
   group,
   boardId,
+  boardDescription,
   workspaceMembers,
   isRetainerBoard,
   isArchivedView
@@ -126,8 +128,8 @@ export const GroupComponent: React.FC<GroupComponentProps> = ({
       </div>
 
       <div className="card !p-0 overflow-x-auto">
-        <div className="min-w-[980px]">
-          <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-secondary-50 border-b border-gray-200 text-sm font-medium text-gray-700">
+        <div className="min-w-0 sm:min-w-[980px]">
+          <div className="hidden sm:grid grid-cols-12 gap-4 px-4 py-3 bg-secondary-50 border-b border-gray-200 text-sm font-medium text-gray-700">
             <div className="col-span-2">Title</div>
             <div className="col-span-3">Notes</div>
             <div className="col-span-2">Status</div>
@@ -143,6 +145,7 @@ export const GroupComponent: React.FC<GroupComponentProps> = ({
               key={item.id}
               item={item}
               boardId={boardId}
+              boardDescription={boardDescription}
               workspaceMembers={workspaceMembers}
               isRetainerBoard={isRetainerBoard}
               isArchivedView={isArchivedView}
