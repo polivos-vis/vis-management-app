@@ -33,11 +33,12 @@ function apiBaseFromDesktopUrl(rawUrl) {
     const parsed = new URL(rawUrl);
     return `${parsed.origin}/api`;
   } catch {
-    return 'http://localhost:3001/api';
+    return 'https://monday-clone-mvp.fly.dev/api';
   }
 }
 
-const API_URL = process.env.DESKTOP_API_URL || apiBaseFromDesktopUrl(DESKTOP_URL);
+// Backend API lives on a different Fly app in production.
+const API_URL = process.env.DESKTOP_API_URL || process.env.DESKTOP_API_BASE_URL || 'https://monday-clone-mvp.fly.dev/api';
 let mainWindow = null;
 let pendingAuthCode = null;
 
