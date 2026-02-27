@@ -4,6 +4,8 @@ const path = require('path');
 const DESKTOP_URL = process.env.DESKTOP_APP_URL || 'http://localhost:3000/desktop';
 const ICON_PNG = path.join(__dirname, 'assets', 'icon.png');
 
+app.setName('INSAIDEM');
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 980,
