@@ -9,7 +9,9 @@ export const Layout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const appVersion = import.meta.env.VITE_APP_VERSION || 'dev';
-  const desktopMacUrl = import.meta.env.VITE_DESKTOP_MAC_URL || '#';
+  const desktopMacUrl =
+    import.meta.env.VITE_DESKTOP_MAC_URL ||
+    'https://drive.google.com/file/d/1NWCxGqeBh4andfmbf6y1dWz4m9Z-b83m/view';
   const desktopWinUrl = import.meta.env.VITE_DESKTOP_WIN_URL || '#';
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [showDesktopCta, setShowDesktopCta] = useState(() => {
@@ -155,12 +157,16 @@ export const Layout: React.FC = () => {
             <div className="flex items-center gap-2">
               <a
                 href={desktopMacUrl}
+                target="_blank"
+                rel="noreferrer"
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-secondary-300 hover:border-secondary-400 ${desktopMacUrl === '#' ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:bg-secondary-50'}`}
               >
                 macOS
               </a>
               <a
                 href={desktopWinUrl}
+                target="_blank"
+                rel="noreferrer"
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-secondary-300 hover:border-secondary-400 ${desktopWinUrl === '#' ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:bg-secondary-50'}`}
               >
                 Windows
