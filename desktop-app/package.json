@@ -1,6 +1,8 @@
 {
   "name": "insaidem-desktop",
   "productName": "INSAIDEM",
+  "description": "INSAIDEM desktop tasks app",
+  "author": "INSAIDEM",
   "version": "0.1.0",
   "private": true,
   "main": "main.js",
@@ -20,6 +22,7 @@
   "build": {
     "appId": "com.insaidem.desktop",
     "productName": "INSAIDEM",
+    "executableName": "INSAIDEM",
     "directories": {
       "output": "release"
     },
@@ -30,6 +33,11 @@
     ],
     "mac": {
       "icon": "assets/icon.icns",
+      "artifactName": "INSAIDEM-${version}-${arch}.${ext}",
+      "extendInfo": {
+        "CFBundleName": "INSAIDEM",
+        "CFBundleDisplayName": "INSAIDEM"
+      },
       "target": [
         "dmg",
         "zip"
@@ -38,6 +46,7 @@
     },
     "win": {
       "icon": "assets/icon.ico",
+      "artifactName": "INSAIDEM-${version}-${arch}.${ext}",
       "target": [
         "nsis",
         "zip"
