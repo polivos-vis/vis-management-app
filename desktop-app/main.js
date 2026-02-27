@@ -1,10 +1,23 @@
 const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
 
-const DESKTOP_URL = process.env.DESKTOP_APP_URL || 'http://localhost:3000/desktop';
+//const DESKTOP_URL = process.env.DESKTOP_APP_URL || 'http://localhost:3000';
+const DESKTOP_URL = process.env.DESKTOP_APP_URL || 'https://vis-management-app.fly.dev';
 const ICON_PNG = path.join(__dirname, 'assets', 'icon.png');
 
 app.setName('INSAIDEM');
+
+function ensureDesktopPath(rawUrl) {
+  try {
+    const parsed = new URL(rawUrl);
+    if (!parsed.pathname || parsed.pathname === '/') {
+      parsed.pathname = '/desktop';
+    }
+    return parsed.toString();
+  } catch {
+    return rawUrl;
+  }
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -26,7 +39,7 @@ function createWindow() {
     }
   });
 
-  win.loadURL(DESKTOP_URL);
+  win.loadURL(ensureDesktopPath(DESKTOP_URL));
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
