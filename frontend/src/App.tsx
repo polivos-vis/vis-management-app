@@ -10,6 +10,7 @@ import { BoardPage } from './pages/BoardPage';
 import { MyTasksPage } from './pages/MyTasksPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { DesktopTasksPage } from './pages/DesktopTasksPage';
+import { DesktopAuthBridgePage } from './pages/DesktopAuthBridgePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,6 +53,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/desktop-auth" element={<DesktopAuthBridgePage />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

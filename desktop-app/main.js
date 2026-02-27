@@ -71,15 +71,9 @@ async function exchangeDesktopCode(code) {
 async function applyTokenToRenderer(token) {
   if (!mainWindow || mainWindow.isDestroyed()) return;
 
-  const loginUrl = new URL('/login?client=desktop', DESKTOP_URL).toString();
-  const desktopUrl = ensureDesktopPath(DESKTOP_URL);
-
-  await mainWindow.loadURL(loginUrl);
-  await mainWindow.webContents.executeJavaScript(
-    `localStorage.setItem('token', ${JSON.stringify(token)}); true;`,
-    true
-  );
-  await mainWindow.loadURL(desktopUrl);
+  const authBridgeUrl = new URL('/desktop-auth', DESKTOP_URL);
+  authBridgeUrl.searchParams.set('token', token);
+  await mainWindow.loadURL(authBridgeUrl.toString());
 }
 
 async function handleDesktopAuthCode(code) {
