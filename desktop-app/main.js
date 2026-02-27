@@ -2,6 +2,7 @@ const { app, BrowserWindow, shell } = require('electron');
 const path = require('path');
 
 const DESKTOP_URL = process.env.DESKTOP_APP_URL || 'http://localhost:3000/desktop';
+const ICON_PNG = path.join(__dirname, 'assets', 'icon.png');
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -14,6 +15,7 @@ function createWindow() {
     autoHideMenuBar: true,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     ...(process.platform === 'darwin' ? { trafficLightPosition: { x: 14, y: 12 } } : {}),
+    ...(process.platform !== 'darwin' ? { icon: ICON_PNG } : {}),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -31,6 +33,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  if (process.platform === 'darwin' && app.dock) {
+    app.dock.setIcon(ICON_PNG);
+  }
   createWindow();
 
   app.on('activate', () => {
