@@ -27,7 +27,9 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      const currentPath = window.location.pathname;
+      const isDesktopRoute = currentPath.startsWith('/desktop');
+      window.location.href = isDesktopRoute ? '/login?client=desktop' : '/login';
     }
     return Promise.reject(error);
   }

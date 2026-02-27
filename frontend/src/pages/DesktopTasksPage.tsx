@@ -421,7 +421,7 @@ export const DesktopTasksPage: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/login?client=desktop');
   };
 
   if (isLoading) {
