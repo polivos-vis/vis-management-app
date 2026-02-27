@@ -16,6 +16,7 @@ export const LoginPage: React.FC = () => {
   const params = new URLSearchParams(location.search);
   const isDesktopClient = params.get('client') === 'desktop';
   const isDesktopBrowserFlow = params.get('desktop') === '1';
+  const showCredentialsForm = !isDesktopClient || isDesktopBrowserFlow;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,74 +51,95 @@ export const LoginPage: React.FC = () => {
           </div>
           <h2 className="text-3xl font-bold tracking-[0.22em] text-gray-900">INSAIDEM</h2>
           <p className="mt-2 text-gray-600">
-            {isDesktopBrowserFlow ? 'Sign in to connect your desktop app' : 'Sign in to your account'}
+            {isDesktopBrowserFlow
+              ? 'Sign in to connect your desktop app'
+              : isDesktopClient
+                ? 'Continue in browser to sign in securely'
+                : 'Sign in to your account'}
           </p>
         </div>
 
         <div className="card">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                {error}
+          {showCredentialsForm ? (
+            <>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    {error}
+                  </div>
+                )}
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="input"
+                    placeholder="you@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="input"
+                    placeholder="••••••••"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Signing in...' : 'Sign in'}
+                </button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600">
+                  Don't have an account?{' '}
+                  <Link to="/register" className="text-primary-700 hover:text-primary-800 font-medium">
+                    Sign up
+                  </Link>
+                </p>
               </div>
-            )}
-
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input"
-                placeholder="you@example.com"
-              />
+            </>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                We'll open your browser, then return to the desktop app automatically.
+              </p>
+              <button
+                type="button"
+                onClick={() => window.open(`${window.location.origin}/login?desktop=1`, '_blank')}
+                className="w-full btn btn-primary"
+              >
+                Continue in browser
+              </button>
             </div>
+          )}
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-primary-700 hover:text-primary-800 font-medium">
-                Sign up
-              </Link>
-            </p>
-          </div>
-
-          {isDesktopClient && (
+          {isDesktopClient && showCredentialsForm && (
             <div className="mt-4 border-t border-gray-200 pt-4">
               <button
                 type="button"
                 onClick={() => window.open(`${window.location.origin}/login?desktop=1`, '_blank')}
                 className="w-full btn btn-secondary"
               >
-                Sign in from browser
+                Open browser again
               </button>
             </div>
           )}
