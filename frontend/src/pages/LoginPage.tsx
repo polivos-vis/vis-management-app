@@ -20,7 +20,10 @@ export const LoginPage: React.FC = () => {
 
     try {
       await login(email, password);
-      const redirectTo = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/workspaces';
+      const fromState = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
+      const params = new URLSearchParams(location.search);
+      const isDesktopClient = params.get('client') === 'desktop';
+      const redirectTo = fromState || (isDesktopClient ? '/desktop' : '/workspaces');
       navigate(redirectTo);
     } catch (err: any) {
       setError(err.message || 'Failed to login');

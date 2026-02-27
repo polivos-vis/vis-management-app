@@ -23,7 +23,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    const isDesktopRoute = location.pathname.startsWith('/desktop');
+    const loginPath = isDesktopRoute ? '/login?client=desktop' : '/login';
+    return <Navigate to={loginPath} state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
