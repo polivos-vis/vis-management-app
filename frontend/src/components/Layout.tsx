@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { LayoutDashboard, LogOut, User, Briefcase } from 'lucide-react';
+import { LayoutDashboard, LogOut, User, Briefcase, Download } from 'lucide-react';
 import { NotificationPanel } from './NotificationPanel';
 
 export const Layout: React.FC = () => {
@@ -9,16 +9,28 @@ export const Layout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const appVersion = import.meta.env.VITE_APP_VERSION || 'dev';
+  const desktopMacUrl = import.meta.env.VITE_DESKTOP_MAC_URL || '#';
+  const desktopWinUrl = import.meta.env.VITE_DESKTOP_WIN_URL || '#';
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [showDesktopCta, setShowDesktopCta] = useState(() => {
+    return localStorage.getItem('hideDesktopCta') !== 'true';
+  });
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  const dismissDesktopCta = () => {
+    localStorage.setItem('hideDesktopCta', 'true');
+    setShowDesktopCta(false);
+  };
+
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
+
+  const showDesktopCtaOnPage = showDesktopCta && location.pathname === '/workspaces';
 
   return (
     <div className="min-h-screen bg-secondary-50">
@@ -133,6 +145,37 @@ export const Layout: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
       </main>
+      {showDesktopCtaOnPage && (
+        <div className="fixed bottom-4 left-1/2 z-40 w-[min(92vw,760px)] -translate-x-1/2 rounded-2xl border border-secondary-200 bg-white/95 backdrop-blur px-4 py-3 shadow-[0_14px_28px_rgba(15,21,19,0.14)]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="inline-flex items-center gap-2 text-sm text-gray-700">
+              <Download className="w-4 h-4 text-primary-700" />
+              <span>Install INSAIDEM Desktop to manage tasks faster.</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                href={desktopMacUrl}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-secondary-300 hover:border-secondary-400 ${desktopMacUrl === '#' ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:bg-secondary-50'}`}
+              >
+                macOS
+              </a>
+              <a
+                href={desktopWinUrl}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border border-secondary-300 hover:border-secondary-400 ${desktopWinUrl === '#' ? 'pointer-events-none opacity-50' : 'text-gray-700 hover:bg-secondary-50'}`}
+              >
+                Windows
+              </a>
+              <button
+                type="button"
+                onClick={dismissDesktopCta}
+                className="text-xs text-gray-500 hover:text-gray-700 px-1"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
         <div className="text-xs text-gray-400 text-right">v{appVersion}</div>
       </div>

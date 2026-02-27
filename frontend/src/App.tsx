@@ -9,6 +9,7 @@ import { WorkspaceDetailPage } from './pages/WorkspaceDetailPage';
 import { BoardPage } from './pages/BoardPage';
 import { MyTasksPage } from './pages/MyTasksPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { DesktopTasksPage } from './pages/DesktopTasksPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,6 +43,15 @@ function App() {
             <Route path="my-tasks" element={<MyTasksPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
+
+          <Route
+            path="/desktop"
+            element={
+              <ProtectedRoute>
+                <DesktopTasksPage />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

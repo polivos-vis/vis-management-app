@@ -1,0 +1,45 @@
+{
+  "name": "insaidem-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "start:local": "DESKTOP_APP_URL=http://localhost:3000/desktop electron .",
+    "dist": "electron-builder",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.insaidem.desktop",
+    "productName": "INSAIDEM",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "package.json"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

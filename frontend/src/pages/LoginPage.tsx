@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { LayoutDashboard } from 'lucide-react';
 
@@ -11,6 +11,7 @@ export const LoginPage: React.FC = () => {
   
   const { login } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +20,8 @@ export const LoginPage: React.FC = () => {
 
     try {
       await login(email, password);
-      navigate('/workspaces');
+      const redirectTo = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || '/workspaces';
+      navigate(redirectTo);
     } catch (err: any) {
       setError(err.message || 'Failed to login');
     } finally {
