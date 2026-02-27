@@ -5,6 +5,11 @@ const path = require('path');
 const DESKTOP_URL = process.env.DESKTOP_APP_URL || 'https://vis-management-app.fly.dev';
 const ICON_PNG = path.join(__dirname, 'assets', 'icon.png');
 const DESKTOP_PROTOCOL = 'insaidem';
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+}
 
 app.setName('INSAIDEM');
 if (!app.isDefaultProtocolClient(DESKTOP_PROTOCOL)) {
@@ -87,6 +92,20 @@ async function handleDesktopAuthCode(code) {
   }
 }
 
+function extractDeepLinkFromArgv(argv) {
+  return argv.find((arg) => arg.startsWith(`${DESKTOP_PROTOCOL}://`)) || null;
+}
+
+function queueCodeFromUrl(inputUrl) {
+  const code = getDeepLinkCode(inputUrl);
+  if (!code) return;
+  if (mainWindow) {
+    handleDesktopAuthCode(code);
+  } else {
+    pendingAuthCode = code;
+  }
+}
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 980,
@@ -126,6 +145,13 @@ app.whenReady().then(() => {
   if (process.platform === 'darwin' && app.dock) {
     app.dock.setIcon(ICON_PNG);
   }
+
+  // Windows/Linux deep links can arrive in argv on first launch.
+  const startupDeepLink = extractDeepLinkFromArgv(process.argv);
+  if (startupDeepLink) {
+    queueCodeFromUrl(startupDeepLink);
+  }
+
   createWindow();
   if (pendingAuthCode) {
     handleDesktopAuthCode(pendingAuthCode);
@@ -139,28 +165,20 @@ app.whenReady().then(() => {
 
 app.on('open-url', (event, url) => {
   event.preventDefault();
-  const code = getDeepLinkCode(url);
-  if (!code) return;
-  if (mainWindow) {
-    handleDesktopAuthCode(code);
-  } else {
-    pendingAuthCode = code;
-  }
+  queueCodeFromUrl(url);
 });
 
-const gotTheLock = app.requestSingleInstanceLock();
-if (!gotTheLock) {
-  app.quit();
-} else {
+if (gotTheLock) {
   app.on('second-instance', (_event, commandLine) => {
-    const deeplinkArg = commandLine.find((arg) => arg.startsWith(`${DESKTOP_PROTOCOL}://`));
-    const code = deeplinkArg ? getDeepLinkCode(deeplinkArg) : null;
+    const deeplinkArg = extractDeepLinkFromArgv(commandLine);
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
-      if (code) handleDesktopAuthCode(code);
-    } else if (code) {
-      pendingAuthCode = code;
+      if (deeplinkArg) {
+        queueCodeFromUrl(deeplinkArg);
+      }
+    } else if (deeplinkArg) {
+      queueCodeFromUrl(deeplinkArg);
     }
   });
 }
