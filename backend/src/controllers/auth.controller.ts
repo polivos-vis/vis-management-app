@@ -1,10 +1,29 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/auth.middleware';
 
 const prisma = new PrismaClient();
+const desktopAuthCodes = new Map<string, { userId: string; expiresAt: number }>();
+const DESKTOP_CODE_TTL_MS = 2 * 60 * 1000;
+
+const generateToken = (user: { id: string; email: string }) =>
+  jwt.sign(
+    { userId: user.id, email: user.email },
+    process.env.JWT_SECRET || 'your-secret-key',
+    { expiresIn: '7d' }
+  );
+
+const cleanupDesktopCodes = () => {
+  const now = Date.now();
+  for (const [code, value] of desktopAuthCodes.entries()) {
+    if (value.expiresAt <= now) {
+      desktopAuthCodes.delete(code);
+    }
+  }
+};
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -32,11 +51,7 @@ export const register = async (req: Request, res: Response) => {
       }
     });
 
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '7d' }
-    );
+    const token = generateToken(user);
 
     res.status(201).json({
       token,
@@ -75,11 +90,7 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '7d' }
-    );
+    const token = generateToken(user);
 
     res.json({
       token,
@@ -155,5 +166,65 @@ export const updateGroqApiKey = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Update Groq API key error:', error);
     res.status(500).json({ error: 'Failed to update API key' });
+  }
+};
+
+export const createDesktopAuthCode = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    cleanupDesktopCodes();
+    const code = crypto.randomBytes(32).toString('hex');
+    desktopAuthCodes.set(code, { userId, expiresAt: Date.now() + DESKTOP_CODE_TTL_MS });
+
+    res.json({
+      code,
+      expiresInSeconds: Math.floor(DESKTOP_CODE_TTL_MS / 1000)
+    });
+  } catch (error) {
+    console.error('Create desktop auth code error:', error);
+    res.status(500).json({ error: 'Failed to create desktop auth code' });
+  }
+};
+
+export const exchangeDesktopAuthCode = async (req: Request, res: Response) => {
+  try {
+    const { code } = req.body as { code?: string };
+    if (!code) {
+      return res.status(400).json({ error: 'Code is required' });
+    }
+
+    cleanupDesktopCodes();
+    const session = desktopAuthCodes.get(code);
+    if (!session || session.expiresAt <= Date.now()) {
+      desktopAuthCodes.delete(code);
+      return res.status(400).json({ error: 'Desktop code is invalid or expired' });
+    }
+
+    desktopAuthCodes.delete(code);
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const token = generateToken(user);
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar
+      }
+    });
+  } catch (error) {
+    console.error('Exchange desktop auth code error:', error);
+    res.status(500).json({ error: 'Failed to exchange desktop auth code' });
   }
 };

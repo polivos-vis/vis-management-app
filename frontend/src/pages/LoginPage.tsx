@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { LayoutDashboard } from 'lucide-react';
+import api from '../lib/api';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,6 +13,9 @@ export const LoginPage: React.FC = () => {
   const { login } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const isDesktopClient = params.get('client') === 'desktop';
+  const isDesktopBrowserFlow = params.get('desktop') === '1';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,8 +25,13 @@ export const LoginPage: React.FC = () => {
     try {
       await login(email, password);
       const fromState = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
-      const params = new URLSearchParams(location.search);
-      const isDesktopClient = params.get('client') === 'desktop';
+
+      if (isDesktopBrowserFlow) {
+        const response = await api.post<{ code: string; expiresInSeconds: number }>('/auth/desktop/code');
+        window.location.href = `insaidem://auth?code=${encodeURIComponent(response.data.code)}`;
+        return;
+      }
+
       const redirectTo = fromState || (isDesktopClient ? '/desktop' : '/workspaces');
       navigate(redirectTo);
     } catch (err: any) {
@@ -40,7 +49,9 @@ export const LoginPage: React.FC = () => {
             <LayoutDashboard className="w-12 h-12 text-primary-700" />
           </div>
           <h2 className="text-3xl font-bold tracking-[0.22em] text-gray-900">INSAIDEM</h2>
-          <p className="mt-2 text-gray-600">Sign in to your account</p>
+          <p className="mt-2 text-gray-600">
+            {isDesktopBrowserFlow ? 'Sign in to connect your desktop app' : 'Sign in to your account'}
+          </p>
         </div>
 
         <div className="card">
@@ -98,6 +109,18 @@ export const LoginPage: React.FC = () => {
               </Link>
             </p>
           </div>
+
+          {isDesktopClient && (
+            <div className="mt-4 border-t border-gray-200 pt-4">
+              <button
+                type="button"
+                onClick={() => window.open(`${window.location.origin}/login?desktop=1`, '_blank')}
+                className="w-full btn btn-secondary"
+              >
+                Sign in from browser
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

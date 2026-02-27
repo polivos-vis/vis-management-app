@@ -4,8 +4,12 @@ const path = require('path');
 //const DESKTOP_URL = process.env.DESKTOP_APP_URL || 'http://localhost:3000';
 const DESKTOP_URL = process.env.DESKTOP_APP_URL || 'https://vis-management-app.fly.dev';
 const ICON_PNG = path.join(__dirname, 'assets', 'icon.png');
+const DESKTOP_PROTOCOL = 'insaidem';
 
 app.setName('INSAIDEM');
+if (!app.isDefaultProtocolClient(DESKTOP_PROTOCOL)) {
+  app.setAsDefaultProtocolClient(DESKTOP_PROTOCOL);
+}
 
 function ensureDesktopPath(rawUrl) {
   try {
@@ -16,6 +20,70 @@ function ensureDesktopPath(rawUrl) {
     return parsed.toString();
   } catch {
     return rawUrl;
+  }
+}
+
+function apiBaseFromDesktopUrl(rawUrl) {
+  try {
+    const parsed = new URL(rawUrl);
+    return `${parsed.origin}/api`;
+  } catch {
+    return 'http://localhost:3001/api';
+  }
+}
+
+const API_URL = process.env.DESKTOP_API_URL || apiBaseFromDesktopUrl(DESKTOP_URL);
+let mainWindow = null;
+let pendingAuthCode = null;
+
+function getDeepLinkCode(inputUrl) {
+  try {
+    const parsed = new URL(inputUrl);
+    if (parsed.protocol !== `${DESKTOP_PROTOCOL}:`) return null;
+    return parsed.searchParams.get('code');
+  } catch {
+    return null;
+  }
+}
+
+async function exchangeDesktopCode(code) {
+  const response = await fetch(`${API_URL}/auth/desktop/exchange`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ code })
+  });
+
+  if (!response.ok) {
+    const payload = await response.text();
+    throw new Error(`Desktop exchange failed (${response.status}): ${payload}`);
+  }
+
+  return response.json();
+}
+
+async function applyTokenToRenderer(token) {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+
+  const loginUrl = new URL('/login?client=desktop', DESKTOP_URL).toString();
+  const desktopUrl = ensureDesktopPath(DESKTOP_URL);
+
+  await mainWindow.loadURL(loginUrl);
+  await mainWindow.webContents.executeJavaScript(
+    `localStorage.setItem('token', ${JSON.stringify(token)}); true;`,
+    true
+  );
+  await mainWindow.loadURL(desktopUrl);
+}
+
+async function handleDesktopAuthCode(code) {
+  if (!code) return;
+  try {
+    const data = await exchangeDesktopCode(code);
+    await applyTokenToRenderer(data.token);
+  } catch (error) {
+    console.error('Desktop auth callback error:', error);
   }
 }
 
@@ -39,11 +107,18 @@ function createWindow() {
     }
   });
 
+  mainWindow = win;
   win.loadURL(ensureDesktopPath(DESKTOP_URL));
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
+  });
+
+  win.on('closed', () => {
+    if (mainWindow === win) {
+      mainWindow = null;
+    }
   });
 }
 
@@ -52,11 +127,43 @@ app.whenReady().then(() => {
     app.dock.setIcon(ICON_PNG);
   }
   createWindow();
+  if (pendingAuthCode) {
+    handleDesktopAuthCode(pendingAuthCode);
+    pendingAuthCode = null;
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
+
+app.on('open-url', (event, url) => {
+  event.preventDefault();
+  const code = getDeepLinkCode(url);
+  if (!code) return;
+  if (mainWindow) {
+    handleDesktopAuthCode(code);
+  } else {
+    pendingAuthCode = code;
+  }
+});
+
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on('second-instance', (_event, commandLine) => {
+    const deeplinkArg = commandLine.find((arg) => arg.startsWith(`${DESKTOP_PROTOCOL}://`));
+    const code = deeplinkArg ? getDeepLinkCode(deeplinkArg) : null;
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+      if (code) handleDesktopAuthCode(code);
+    } else if (code) {
+      pendingAuthCode = code;
+    }
+  });
+}
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
