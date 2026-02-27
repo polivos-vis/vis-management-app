@@ -3,7 +3,7 @@
   "productName": "INSAIDEM",
   "description": "INSAIDEM desktop tasks app",
   "author": "INSAIDEM",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "private": true,
   "main": "main.js",
   "scripts": {
